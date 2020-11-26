@@ -16,6 +16,11 @@ typedef struct	s_table
 	pthread_t		*tid;
 }				t_table;
 
+typedef struct	s_fork
+{
+	int			state;
+}				t_fork;
+
 typedef struct	s_philo
 {
 	int				action;
@@ -27,11 +32,12 @@ typedef struct	s_philo
 	int				name;
 	int				head;
 	int				start;
-	int				uptime;
 	pthread_t		tid;
 	struct s_philo	*next;
 	struct s_philo	*prev;
 	struct s_table	*table;
+	struct s_fork	*l_fork;
+	struct s_fork	*r_fork;
 }				t_philo;
 
 # define FORK_ACTION 1
@@ -40,7 +46,6 @@ typedef struct	s_philo
 # define THINK_ACTION 4
 # define DIE_ACTION 5
 
-int					g_forks;
 pthread_mutex_t		g_lock;
 
 int			ft_atoi(const char *str);

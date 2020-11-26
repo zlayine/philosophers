@@ -25,10 +25,26 @@ int		get_current_time()
 	return (current_time.tv_sec * 1000);
 }
 
+int		life_checker(t_philo *philo, int *time)
+{
+	int	death;
+
+	death = get_current_time() - philo->start >= philo->die_time;
+	if (death && philo->action != EAT_ACTION)
+		return (0);
+	death = get_current_time() - philo->start + *time >= philo->die_time;
+	if (death && philo->action == THINK_ACTION)
+		*time = philo->die_time - get_current_time() - philo->start;
+	else if (death && philo->action == SLEEP_ACTION)
+		return (-1);
+	return (1);
+}
+
 int		ft_do_action(t_philo *philo)
 {
 	int time;
 
+	// printf("%d UPTIME: %d\n", philo->name, get_current_time() - philo->start);
 	time = 0;
 	if (philo->action == EAT_ACTION)
 		time = philo->eat_time;
@@ -36,10 +52,8 @@ int		ft_do_action(t_philo *philo)
 		time = philo->sleep_time;
 	else if (philo->action == THINK_ACTION)
 		time = philo->think_time;
-	if (philo->uptime + time >= philo->die_time)
+	if (!life_checker(philo, &time))
 		philo->action = 5;
-	else
-		philo->uptime += time;
 	print_status(philo);
 	if (philo->action != 5)
 		usleep(time * 1000);
@@ -47,9 +61,10 @@ int		ft_do_action(t_philo *philo)
 		return (-1);
 	if (philo->action == EAT_ACTION)
 	{
-		g_forks += 2;
+		philo->l_fork->state = 0;
+		philo->r_fork->state = 0;
 		philo->start = get_current_time();
-		philo->uptime = 0;
+		// printf("LF %d RF %d\n", philo->l_fork->state, philo->r_fork->state);
 	}
 	return (1);
 }
@@ -61,22 +76,25 @@ int		ft_action(t_philo *philo)
 	status = 1;
 	if (philo->action == FORK_ACTION)
 	{
-		pthread_mutex_lock(&g_lock); 
-		if (g_forks >= 2)
-			g_forks -= 2;
+		pthread_mutex_lock(&g_lock);
+		// printf("%d LF %d RF %d\n", philo->name, philo->l_fork->state, philo->r_fork->state);
+		if (!philo->l_fork->state && !philo->r_fork->state)
+		{
+			// printf("LF %d RF %d\n", philo->l_fork->state, philo->r_fork->state);
+			philo->l_fork->state = 1;
+			philo->r_fork->state = 1;
+			print_status(philo);
+		}
 		else
+		{
 			status = 0;
+			// printf("----------- no fork for %d\n", philo->name);
+		}
 		pthread_mutex_unlock(&g_lock); 
 	}
 	else
 		status = ft_do_action(philo);
 	return (status);
-}
-
-void	check_life(t_philo *philo)
-{
-	if (philo->start + philo->die_time <= get_current_time())
-		philo->action = 5;
 }
 
 void	*ft_philo_life(void *arg)
@@ -88,6 +106,9 @@ void	*ft_philo_life(void *arg)
 	life = 1;
 	me->action = 1;
 	me->start = get_current_time();
+	// printf("Start %d LF %d RF %d\n", me->name, me->l_fork->state, me->r_fork->state);
+	me->l_fork->state = 0;
+	me->r_fork->state = 0;
 	while (life)
 	{
 		// printf("[---%d---]action: %d \n", me->name, me->action);
@@ -102,15 +123,25 @@ void	*ft_philo_life(void *arg)
 		}
 		else
 			life = 1;
-		check_life(me);
+		if (me->start + me->die_time <= get_current_time())
+			me->action = 5;
 	}
 	return (NULL);
+}
+
+t_fork		*forge_fork()
+{
+	t_fork	*fork;
+
+	fork = malloc(sizeof(t_fork));
+	fork->state = 0;
+	return (fork);
 }
 
 t_philo		*init_philo(int name, t_philo *prev)
 {
 	int 	die_time = 10000;
-	int 	eat_time = 5000;
+	int 	eat_time = 4000;
 	int		sleep_time = 4000;
 	int		eat_num = -1;
 	t_philo	*philo;
@@ -126,11 +157,17 @@ t_philo		*init_philo(int name, t_philo *prev)
 	philo->head = 0;
 	philo->tid = 0;
 	philo->start = 0;
-	philo->uptime = 0;
 	philo->next = NULL;
 	philo->prev = prev;
+	philo->r_fork = forge_fork();
+	philo->l_fork = NULL;
 	if (prev)
+	{
+		philo->l_fork = prev->r_fork;
 		prev->next = philo;
+	}
+	if (philo->l_fork)
+		printf("%d RF: %d LF: %d\n", name, philo->r_fork->state, philo->l_fork->state);
 	printf("Philo %d created\n", name);
 	return (philo);
 }
@@ -146,12 +183,14 @@ t_philo		*create_philos(int total, t_table *table)
 	tmp = NULL;
 	while (i < total)
 	{
-		tmp = init_philo(i, tmp);
+		tmp = init_philo(i + 1, tmp);
 		tmp->table = table;
 		if (!head)
 			head = tmp;
 		i++;
-	}	
+	}
+	head->l_fork = tmp->r_fork;
+	printf("HEAD %d RF: %d LF: %d\n", head->name, head->r_fork->state, head->l_fork->state);
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
@@ -171,7 +210,6 @@ t_table		*init_table(char **args)
 	// table->forks = atoi(forks);
 	table->persons = persons;
 	table->forks = forks;
-	g_forks = 3;
 	table->tid = malloc(sizeof(int) * persons);
 	pthread_mutex_init(&g_lock, NULL);
 	table->philos = create_philos(persons, table);
@@ -205,16 +243,16 @@ void	finish_simulation(t_table *table)
 	t_philo	*tmp;
 	int		i;
 
-	table->philos->prev->next = NULL;
-	while (table->philos)
-	{
-		tmp = table->philos->next;
-		ft_del(table->philos);
-		table->philos = tmp;
-	}
-	i = -1;
-	while (++i < table->persons)
-		pthread_detach(table->tid[i]);
+	// table->philos->prev->next = NULL;
+	// while (table->philos)
+	// {
+	// 	tmp = table->philos->next;
+	// 	ft_del(table->philos);
+	// 	table->philos = tmp;
+	// }
+	// i = -1;
+	// while (++i < table->persons)
+	// 	pthread_detach(table->tid[i]);
 	// error caused here
 	// ft_del(table->tid);
 	// ft_del(table);
