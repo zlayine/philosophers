@@ -17,11 +17,13 @@ typedef struct	s_philo
 {
 	int				status;
 	int				die_time;
+	int				think_time;
 	int				eat_time;
 	int				sleep_time;
 	int				eat_num;
 	int				name;
 	int				head;
+	int				start;
 	pthread_t		tid;
 	struct s_philo	*next;
 	struct s_philo	*prev;

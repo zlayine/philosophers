@@ -16,21 +16,45 @@ void	ft_die()
 
 }
 
-void	ft_action(int time, int name, int action)
+void	ft_do_action(t_philo *philo, int action)
 {
-	print_status(action, name);
+	int time;
+	if (action == EAT_ACTION)
+		time = philo->eat_time;
+	else if (action == SLEEP_ACTION)
+		time = philo->sleep_time;
+	else if (action == THINK_ACTION)
+		time = philo->think_time;
+}
+
+int		ft_action(t_philo *philo, int action)
+{
+	int status;
+
+	status = 0;
 	if (action == FORK_ACTION)
 	{
-
-	}
-	else if (action == EAT_ACTION)
-	{
-
+		pthread_mutex_lock(&g_lock); 
+		if (g_forks > 0)
+			g_forks -= 2;
+		else
+			status = -1;
+		pthread_mutex_unlock(&g_lock); 
 	}
 	else if (action != DIE_ACTION)
 	{
-		usleep(time * 1000);
+		print_status(action, philo->name);
+		usleep(10 * 1000);
+		status = 1;
 	}
+	if (action == EAT_ACTION)
+	{
+		g_forks += 2;
+		philo->start = reset_timer(philo);
+	}
+	if (action == DIE_ACTION)
+		print_status(action, philo->name);
+	return (status);
 }
 
 void	print_status(int status, int name)
@@ -52,15 +76,44 @@ void	print_status(int status, int name)
 		printf("died");
 }
 
+int		check_life(int start, int end, int time)
+{
+
+}
+
 void	*ft_philo_life(void *arg)
 {
 	t_philo *me;
+	int		life;
+	int		status;
+
+	int		start;
+	int		end;
+	struct timeval current_time;
 
 	me = (t_philo*)arg;
-	pthread_mutex_lock(&g_lock); 
+	life = 1;
+	status = 1;
+	while (life)
+	{
+		life = ft_action(me, status);
+		if (life == 1)
+			status = status == 4 ? 1 : status + 1;
+		else if (life == -1)
+			status = 5;
+		else
+			life = 1;
+		// if (!check_life(start, end, me->die_time))
+		// 	ft_die();
+		// gettimeofday(&current_time, NULL);
+		// start = current_time.tv_sec;
+		
+		// gettimeofday(&current_time, NULL);
+	}
+	// pthread_mutex_lock(&g_lock); 
 	printf("%d is alive\n", me->name);
 	// sleep(3);
-  	pthread_mutex_unlock(&g_lock); 
+  	// pthread_mutex_unlock(&g_lock); 
 	return (NULL);
 }
 
@@ -74,6 +127,7 @@ t_philo		*init_philo(int name, t_philo *prev)
 
 	philo = malloc(sizeof(t_philo));
 	philo->die_time = die_time;
+	philo->die_time = die_time - eat_time - sleep_time;
 	philo->eat_time = eat_time;
 	philo->sleep_time = sleep_time;
 	philo->eat_num = eat_num;
@@ -81,6 +135,7 @@ t_philo		*init_philo(int name, t_philo *prev)
 	philo->status = 0;
 	philo->head = 0;
 	philo->tid = 0;
+	philo->start = 0;
 	philo->next = NULL;
 	philo->prev = prev;
 	if (prev)
