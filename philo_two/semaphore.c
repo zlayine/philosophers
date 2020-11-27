@@ -3,12 +3,12 @@
 #include <semaphore.h> 
 #include <unistd.h> 
   
-sem_t mutex; 
+sem_t *mutex; 
   
 void* thread(void* arg) 
 { 
     //wait 
-    sem_wait(&mutex); 
+    sem_wait(mutex); 
     printf("\nEntered..\n"); 
   
     //critical section 
@@ -16,20 +16,22 @@ void* thread(void* arg)
       
     //signal 
     printf("\nJust Exiting...\n"); 
-    sem_post(&mutex); 
+    sem_post(mutex); 
 	return NULL;
 } 
   
   
 int main() 
 { 
-    sem_init(&mutex, 0, 1);
+    // sem_init(&mutex, 0, 1);
+	mutex = sem_open("pSem", O_CREAT | O_EXCL, 0644, 1); 
+	sem_unlink("pSem");
     pthread_t t1,t2; 
     pthread_create(&t1,NULL,thread,NULL); 
     sleep(2); 
     pthread_create(&t2,NULL,thread,NULL); 
     pthread_join(t1,NULL); 
     pthread_join(t2,NULL); 
-    sem_destroy(&mutex); 
+    sem_close(mutex); 
     return 0; 
 } 
