@@ -16,14 +16,14 @@ void* thread(void* arg)
       
     //signal 
     printf("\nJust Exiting...\n"); 
-    sem_post(mutex); 
+    sem_post(mutex);
+
 	return NULL;
 } 
   
   
 int main() 
 { 
-    // sem_init(&mutex, 0, 1);
 	mutex = sem_open("pSem", O_CREAT | O_EXCL, 0644, 1); 
 	sem_unlink("pSem");
     pthread_t t1,t2; 

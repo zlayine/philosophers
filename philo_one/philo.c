@@ -2,121 +2,63 @@
 
 void	print_status(t_philo *philo, int action)
 {
-	pthread_mutex_lock(philo->print);
-	printf("%d ", get_current_time());
-	printf("%d ", philo->name);
+	
+	action != 5 ? pthread_mutex_lock(philo->print) : 0;
+	// ft_putstr(ft_itoa(philo->start));
+	// ft_putchar(' ');
+	ft_putstr(ft_itoa(get_current_time(0)));
+	ft_putchar(' ');
+	ft_putstr(ft_itoa(philo->name));
+	ft_putchar(' ');
 	if (action == FORK_ACTION)
-		printf("has taken a fork");
+		ft_putstr("has taken a fork");
 	else if (action == EAT_ACTION)
-		printf("is eating");
+		ft_putstr("is eating");
 	else if (action == SLEEP_ACTION)
-		printf("is sleeping");
+		ft_putstr("is sleeping");
 	else if (action == THINK_ACTION)
-		printf("is thinking");
+		ft_putstr("is thinking");
 	else if (action == DIE_ACTION)
-		printf("died");
-	printf("\n");
-	pthread_mutex_unlock(philo->print);
-
+		ft_putstr("died");
+	ft_putchar('\n');
+	action != 5 ? pthread_mutex_unlock(philo->print) : 0;
 }
 
-int		get_current_time()
+long	get_current_time(int micro)
 {
 	struct timeval current_time;
 
 	gettimeofday(&current_time, NULL);
-	return (current_time.tv_sec * 1000);
-}
-
-int		life_checker(t_philo *philo, int *time)
-{
-	int	death;
-
-	death = get_current_time() - philo->start >= philo->die_time;
-	if (death && philo->action != EAT_ACTION)
-		return (0);
-	death = get_current_time() - philo->start + *time >= philo->die_time;
-	if (death && philo->action == THINK_ACTION)
-		*time = philo->die_time - get_current_time() - philo->start;
-	else if (death && philo->action == SLEEP_ACTION)
-		return (-1);
-	return (1);
-}
-
-int		ft_do_action(t_philo *philo)
-{
-	int time;
-
-	// printf("%d UPTIME: %d\n", philo->name, get_current_time() - philo->start);
-	time = 0;
-	if (philo->action == EAT_ACTION)
-		time = philo->eat_time;
-	else if (philo->action == SLEEP_ACTION)
-		time = philo->sleep_time;
-	else if (philo->action == THINK_ACTION)
-		time = philo->think_time;
-	if (!life_checker(philo, &time))
-		philo->action = 5;
-	print_status(philo);
-	if (philo->action != 5)
-		usleep(time * 1000);
+	// printf("S: %ld | MS: %ld\n ", current_time.tv_sec, current_time.tv_sec * 100000L + current_time.tv_usec);
+	if (!micro)
+		return ((current_time.tv_sec * 100000L + current_time.tv_usec) / 1000);
 	else
-		return (-1);
-	if (philo->action == EAT_ACTION)
-	{
-		// philo->l_fork->state = 0;
-		// philo->r_fork->state = 0;
-		philo->start = get_current_time();
-		// printf("LF %d RF %d\n", philo->l_fork->state, philo->r_fork->state);
-	}
-	return (1);
-}
-
-int		ft_action(t_philo *philo)
-{
-	int status;
-
-	status = 1;
-	if (philo->action == FORK_ACTION)
-	{
-		pthread_mutex_lock(&g_lock);
-		// printf("%d LF %d RF %d\n", philo->name, philo->l_fork->state, philo->r_fork->state);
-		// if (!philo->l_fork->state && !philo->r_fork->state)
-		// {
-			// printf("LF %d RF %d\n", philo->l_fork->state, philo->r_fork->state);
-			print_status(philo);
-		// }
-		else
-		{
-			status = 0;
-			// printf("----------- no fork for %d\n", philo->name);
-		}
-		pthread_mutex_unlock(&g_lock); 
-	}
-	else
-		status = ft_do_action(philo);
-	return (status);
+		return (current_time.tv_sec * 100000L + current_time.tv_usec);
 }
 
 void	ft_get_fork(t_philo *philo)
 {
-	pthread_mutex_lock(philo->r_fork);
+	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
 	print_status(philo, FORK_ACTION);
-	pthread_mutex_lock(philo->l_fork);
+	pthread_mutex_lock(&philo->mutex[philo->l_fork]);
 	print_status(philo, FORK_ACTION);
 }
 
-void	ft_release_fork(t_philo *philo)
+void	ft_drop_fork(t_philo *philo)
 {
-	pthread_mutex_unlock(philo->r_fork);
-	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_unlock(&philo->mutex[philo->r_fork]);
+	pthread_mutex_unlock(&philo->mutex[philo->l_fork]);
 }
 
 void	ft_eat(t_philo *philo)
 {
 	print_status(philo, EAT_ACTION);
-	philo->start = get_current_time();
 	usleep(philo->eat_time * 1000);
+	ft_drop_fork(philo);
+	philo->start = get_current_time(1);
+	if (philo->eat_num != -1)
+		philo->eat_num--;
+	ft_sleep(philo);
 }
 
 void	ft_sleep(t_philo *philo)
@@ -126,28 +68,51 @@ void	ft_sleep(t_philo *philo)
 	print_status(philo, THINK_ACTION);
 }
 
+void	*ft_philo_checker(void *arg)
+{
+	t_philo	*philo;
+
+	philo = (t_philo*)arg;
+	while (1)
+	{
+		if (philo->eat_num == 0)
+		{
+			pthread_mutex_lock(philo->print);
+			printf("Simulation stops here %d\n", philo->name);
+			break;
+		}
+		if (get_current_time(1) > philo->start + (philo->die_time * 1000))
+		{
+			pthread_mutex_lock(philo->print);
+			philo->die = 1;
+			print_status(philo, DIE_ACTION);
+			break ;
+		}
+	}
+	finish_simulation(philo->table);
+	return (NULL);
+}
+
 void	*ft_philo_life(void *arg)
 {
-	t_philo *me;
-	int		life;
+	t_philo		*me;
+	pthread_t	checker;
+	int			life;
 
 	me = (t_philo*)arg;
 	life = 1;
 	me->action = 1;
-	me->start = get_current_time();
-	setup_philo_checker();
-	while (life)
+	me->start = get_current_time(1);
+	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
+	while (1)
 	{
 		ft_get_fork(me);
 		ft_eat(me);
-		ft_release_fork(me);
-		ft_sleep(me);
-		life = check_philo(me);
 	}
 	return (NULL);
 }
 
-t_philo		*init_philo(int name, t_philo *prev, char **args, pthread_mutex_t *mutex)
+t_philo		*init_philo(int name, t_philo *prev, char **args)
 {
 	t_philo	*philo;
 
@@ -155,21 +120,22 @@ t_philo		*init_philo(int name, t_philo *prev, char **args, pthread_mutex_t *mute
 	philo->die_time = ft_atoi(args[1]);
 	philo->eat_time = ft_atoi(args[2]);
 	philo->sleep_time = ft_atoi(args[3]);
-	philo->eat_num = ft_atoi(args[4]);
+	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
 	philo->action = 1;
 	philo->head = 0;
 	philo->start = 0;
+	philo->die = 0;
 	philo->next = NULL;
 	philo->prev = prev;
-	philo->r_fork = &mutex[name - 1];
-	philo->l_fork = NULL;
+	philo->r_fork = name - 1;
+	philo->l_fork = 0;
 	if (prev)
 	{
 		philo->l_fork = prev->r_fork;
 		prev->next = philo;
 	}
-	printf("Philo %d created\n", name);
+	// printf("Philo %d created\n", name);
 	return (philo);
 }
 
@@ -186,19 +152,24 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 {
 	t_philo 		*head;
 	t_philo			*tmp;
-	pthread_mutex_t	mutex[total];
-	pthread_mutex_t	print;
+	pthread_mutex_t	*mutex;
+	pthread_mutex_t	*print;
 	int		i;
 
+	// printf("----------------- Creating simulation ---------------\n");
 	i = 0;
 	head = NULL;
 	tmp = NULL;
+	mutex = malloc(sizeof(pthread_mutex_t) * total);
+	print = malloc(sizeof(pthread_mutex_t));
 	init_mutex(mutex, total);
-	pthread_mutex_init(&print, NULL);
+	pthread_mutex_init(print, NULL);
 	while (i < total)
 	{
-		tmp = init_philo(i + 1, tmp, args, mutex);
-		tmp->print = &print;
+		tmp = init_philo(i + 1, tmp, args);
+		tmp->table = table;
+		tmp->mutex = mutex;
+		tmp->print = print;
 		if (!head)
 			head = tmp;
 		i++;
@@ -207,7 +178,7 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
-	printf("----------------- Starting simulation ---------------\n");
+	// printf("----------------- Starting simulation ---------------\n");
 	return (head);
 }
 
@@ -226,60 +197,71 @@ t_table		*init_table(char **args)
 
 void	create_lifes(t_table *table)
 {
-	t_philo *tmp;
-	int		i;
+	t_philo 	*tmp;
+	pthread_t	tids[table->persons];
+	int			i;
 
 	i = 0;
 	tmp = table->philos;
 	while (tmp)
 	{
-		pthread_create(&(tmp->thrd), NULL, &ft_philo_life, (void *)tmp);
-		pthread_join(tmp->thrd, NULL);
+		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
 		tmp = tmp->next;
+		tids[i] = tmp->thrd;
 		i++;
 		if (tmp->head)
 			break ;
-		usleep(50);
+		usleep(100);
 	}
-	// i = 0;
-	// while (i < table->persons)
-		// pthread_join(table->tid[i++], NULL);
+	i = 0;
+	while (i < table->persons)
+		pthread_join(tids[i++], NULL);
 }
 
 void	finish_simulation(t_table *table)
 {
+	t_philo	*curr;
 	t_philo	*tmp;
 	int		i;
 
-	// table->philos->prev->next = NULL;
-	// while (table->philos)
+	curr = table->philos;
+	i = -1;
+
+	while (++i < table->persons)
+		pthread_mutex_destroy(&curr->mutex[i]);
+	pthread_mutex_destroy(curr->print);
+	// ft_del(curr->print);
+	// ft_del(curr->mutex);
+	// curr->prev->next = NULL;
+	// while (curr)
 	// {
-	// 	tmp = table->philos->next;
-	// 	ft_del(table->philos);
-	// 	table->philos = tmp;
+	// 	pthread_detach(curr->thrd);
+	// 	tmp = curr->next;
+	// 	ft_del(curr);
+	// 	curr = tmp;
 	// }
-	// i = -1;
-	// while (++i < table->persons)
-	// 	pthread_detach(table->tid[i]);
-	// error caused here
-	// ft_del(table->tid);
 	// ft_del(table);
-	// pthread_mutex_destroy(&g_lock);
 	exit(0);
 }
 
-int		check_arguments(int total, char **args)
+int		valid_args(int total, char **args)
 {
 	if (total < 2 || total > 6)
 		return (0);
-	// check values of args here
+	// if (ft_atoi(args[0]) <= 0)
+	// {
+
+	// }
+	// if (ft_atoi(args[1]) <= 0)
+	// {}
+	return (1);
 }
 
 int main(int argc, char **argv)
 {
 	t_table	*table;
 
-	if (!check_arguments(argc, ++argv))
+	if (!valid_args(argc, ++argv))
 	{
 		printf("Please specify the required arguments\n");
 		return (1);

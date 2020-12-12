@@ -27,19 +27,22 @@ typedef struct	s_philo
 {
 	int				action;
 	int				die_time;
-	int				think_time;
 	int				eat_time;
 	int				sleep_time;
 	int				eat_num;
 	int				name;
 	int				head;
 	int				start;
-	pthread_t		tid;
+	int				die;
+	pthread_t		thrd;
+	struct s_table	*table;
 	struct s_philo	*next;
 	struct s_philo	*prev;
 	struct s_table	*table;
-	struct s_fork	*l_fork;
-	struct s_fork	*r_fork;
+	int				l_fork;
+	int				r_fork;
+	sem_t			*print;
+	sem_t			*sem;
 }				t_philo;
 
 # define FORK_ACTION 1
@@ -48,20 +51,19 @@ typedef struct	s_philo
 # define THINK_ACTION 4
 # define DIE_ACTION 5
 
-pthread_mutex_t		g_lock;
 
 int			ft_atoi(const char *str);
 void		ft_putstr(char *s);
 void		ft_putchar(char c);
 void		ft_del(void *data);
-void		print_status(t_philo *philo);
-int			get_current_time();
+void		print_status(t_philo *philo, int action);
+long		get_current_time(int micro);
 int			ft_do_action(t_philo *philo);
 int			ft_action(t_philo *philo);
 void		check_life(t_philo *philo);
 void		*ft_philo_life(void *arg);
-t_philo		*init_philo(int name, t_philo *prev);
-t_philo		*create_philos(int total, t_table *table);
+t_philo		*init_philo(int name, t_philo *prev, char **args);
+t_philo		*create_philos(int total, t_table *table, char **args);
 t_table		*init_table(char **args);
 void		create_lifes(t_table *table);
 void		finish_simulation(t_table *table);
