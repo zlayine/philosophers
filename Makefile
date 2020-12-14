@@ -24,20 +24,20 @@ PHILO_THREE_HEAD = philo_three/philo.h
 all: $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
 $(PHILO_ONE): $(OBJ) $(PHILO_ONE_MAIN) $(PHILO_ONE_HEAD)
-	@gcc $(PHILO_ONE_MAIN) $(OBJ) -o $(PHILO_ONE)
+	@gcc -g $(PHILO_ONE_MAIN) $(OBJ) -o $(PHILO_ONE)
 	@echo "SUCCESS! NO WWW ADDED"
 
 $(PHILO_TWO): $(OBJ) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
-	@gcc $(PHILO_TWO_MAIN) $(OBJ) -o $(PHILO_TWO)
+	@gcc -g $(PHILO_TWO_MAIN) $(OBJ) -o $(PHILO_TWO)
 	@echo "SUCCESS! NO WWW ADDED"
 
 
 $(PHILO_THREE): $(OBJ) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
-	@gcc $(PHILO_THREE_MAIN) $(OBJ) -o $(PHILO_THREE)
+	@gcc $(PHILO_THREE_MAIN) $(OBJ) -g -o $(PHILO_THREE)
 	@echo "SUCCESS! NO WWW ADDED"
 
 %.o: %.c
-	@gcc -c $< -o $@ -I philo.h
+	@gcc -g -c $< -o $@ -I philo.h
 
 clean:
 	@rm -rf $(OBJ)

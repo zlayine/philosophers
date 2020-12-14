@@ -17,12 +17,12 @@ typedef struct	s_table
 	int				forks;
 	int				end;
 	sem_t			*game;
+	pthread_t		checker;
 	struct s_philo	*philos;
 }				t_table;
 
 typedef struct	s_philo
 {
-	int				action;
 	int				die_time;
 	int				eat_time;
 	int				sleep_time;
@@ -31,9 +31,11 @@ typedef struct	s_philo
 	int				head;
 	long			start;
 	int				die;
+	int				done;
 	sem_t			*print;
 	sem_t			*sem;
 	pthread_t		checker;
+	struct timeval	start_time;
 	struct s_philo	*next;
 	struct s_philo	*prev;
 	struct s_table	*table;
@@ -51,7 +53,7 @@ char		*ft_itoa(long n);
 void		ft_putchar(char c);
 void		ft_del(void *data);
 void		print_status(t_philo *philo, int action);
-long		get_current_time(int micro);
+long		get_current_time(int micro, struct timeval start_time);
 int			ft_do_action(t_philo *philo);
 int			ft_action(t_philo *philo);
 void		check_life(t_philo *philo);
@@ -60,13 +62,12 @@ t_philo		*init_philo(int name, t_philo *prev, char **args);
 t_philo		*create_philos(int total, t_table *table, char **args);
 t_table		*init_table(char **args);
 void		create_lifes(t_table *table);
-void		finish_simulation(t_table *table);
+void		finish_simulation(t_table *table, int death);
 void		ft_sleep(t_philo *philo);
 void		ft_eat(t_philo *philo);
 void		ft_drop_fork(t_philo *philo);
 void		ft_get_fork(t_philo *philo);
 sem_t		*init_semaphore(int total, char *name);
-
-
+void		*game_checker(void *arg);
 
 #endif

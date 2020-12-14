@@ -17,12 +17,12 @@ typedef struct	s_table
 	int				forks;
 	int				end;
 	sem_t			*game;
+	pthread_t		checker;
 	struct s_philo	*philos;
 }				t_table;
 
 typedef struct	s_philo
 {
-	int				action;
 	int				die_time;
 	int				eat_time;
 	int				sleep_time;
@@ -35,6 +35,7 @@ typedef struct	s_philo
 	sem_t			*print;
 	sem_t			*sem;
 	pthread_t		thrd;
+	pthread_t		checker;
 	struct timeval	start_time;
 	struct s_philo	*next;
 	struct s_philo	*prev;
@@ -68,7 +69,6 @@ void		ft_eat(t_philo *philo);
 void		ft_drop_fork(t_philo *philo);
 void		ft_get_fork(t_philo *philo);
 sem_t		*init_semaphore(int total, char *name);
-
-
+void		*game_checker(void *arg);
 
 #endif

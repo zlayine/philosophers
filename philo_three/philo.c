@@ -2,14 +2,20 @@
 
 void	print_status(t_philo *philo, int action)
 {
-	
-	// action != 5 ? sem_wait(philo->print) : 0;
-	sem_wait(philo->print);
-	// ft_putstr(ft_itoa(philo->start));
-	// ft_putchar(' ');
-	ft_putstr(ft_itoa(get_current_time(0)));
+	char	*tmp;
+
+	action != DIE_ACTION ? sem_wait(philo->print) : 0;
+	// if ((philo->table->end && action != 5) || (action == 5 && philo->table->end != philo->name))
+	// 	return ;
+	// if ((philo->table->end && action != 5))
+	// 	return ;
+	tmp = ft_itoa(get_current_time(0, philo->start_time));
+	ft_putstr(tmp);
+	ft_del(tmp);
 	ft_putchar(' ');
-	ft_putstr(ft_itoa(philo->name));
+	tmp = ft_itoa(philo->name);
+	ft_putstr(tmp);
+	ft_del(tmp);
 	ft_putchar(' ');
 	if (action == FORK_ACTION)
 		ft_putstr("has taken a fork");
@@ -22,20 +28,22 @@ void	print_status(t_philo *philo, int action)
 	else if (action == DIE_ACTION)
 		ft_putstr("died");
 	ft_putchar('\n');
-	// action != 5 ? sem_post(philo->print) : 0;
-	sem_post(philo->print);
+	// action != DIE_ACTION ? sem_post(philo->print) : 0;
+	action != DIE_ACTION ? sem_post(philo->print) : 0;
+	// sem_post(philo->print);
 }
 
-long	get_current_time(int micro)
+long	get_current_time(int micro, struct timeval start_time)
 {
-	struct timeval current_time;
+	struct timeval	current_time;
+	int				time;
 
 	gettimeofday(&current_time, NULL);
-	// printf("S: %ld | MS: %ld\n ", current_time.tv_sec, current_time.tv_sec * 100000L + current_time.tv_usec);
+	time = ((current_time.tv_sec - start_time.tv_sec) * 1000000L + current_time.tv_usec) - start_time.tv_usec;
 	if (!micro)
-		return ((current_time.tv_sec * 100000L + current_time.tv_usec) / 1000);
+		return (time / 1000);
 	else
-		return (current_time.tv_sec * 100000L + current_time.tv_usec);
+		return (time);
 }
 
 void	ft_get_fork(t_philo *philo)
@@ -56,10 +64,10 @@ void	ft_drop_fork(t_philo *philo)
 
 void	ft_eat(t_philo *philo)
 {
+	philo->start = get_current_time(1, philo->start_time);
 	print_status(philo, EAT_ACTION);
 	usleep(philo->eat_time * 1000);
 	ft_drop_fork(philo);
-	philo->start = get_current_time(1);
 	if (philo->eat_num != -1)
 		philo->eat_num--;
 	ft_sleep(philo);
@@ -70,6 +78,31 @@ void	ft_sleep(t_philo *philo)
 	print_status(philo, SLEEP_ACTION);
 	usleep(philo->sleep_time * 1000);
 	print_status(philo, THINK_ACTION);
+}
+
+void	*game_checker(void *arg)
+{
+	t_table	*table;
+	t_philo *philo;
+	int		done;
+
+	table = (t_table*)arg;
+	philo = table->philos;
+	done = 0;
+	while (1)
+	{
+		if (philo && philo->eat_num == 0 && philo->done && philo->die != -1)
+		{
+			done++;
+			philo->die = -1;
+		} else if (table->end)
+			break ;
+		philo = philo->next;
+		if (done == table->persons)
+			break ;
+	}
+	sem_post(table->game);
+	return (NULL);
 }
 
 void	*ft_philo_checker(void *arg)
@@ -83,11 +116,11 @@ void	*ft_philo_checker(void *arg)
 			break ;
 		if (philo->eat_num == 0)
 		{
-			philo->die = 1;
+			philo->die = -1;
 			sem_post(philo->table->game);
 			break;
 		}
-		else if (get_current_time(1) > philo->start + (philo->die_time * 1000))
+		else if (get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
@@ -98,22 +131,46 @@ void	*ft_philo_checker(void *arg)
 	return (NULL);
 }
 
+// void	*ft_philo_checker(void *arg)
+// {
+// 	t_philo *philo;
+
+// 	philo = (t_philo*)arg;
+// 	while (philo->table->end == 0)
+// 	{
+// 		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
+// 		{
+// 			philo->die = 1;
+// 			// sem_wait(philo->print);
+// 			print_status(philo, DIE_ACTION);
+// 			philo->table->end = philo->table->end == 0 ? philo->name : philo->table->end;
+// 			break ;
+// 		}
+// 	}
+// 	sem_post(philo->table->game);
+// 	return (NULL);
+// }
+
 void	ft_philo_life(t_philo *me)
 {
 	pthread_t	checker;
 	int			life;
 
 	life = 1;
-	me->action = 1;
-	me->start = get_current_time(1);
+	me->start = get_current_time(1, me->start_time);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
 	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
 		ft_eat(me);
+		if (me->eat_num == 0)
+		{
+			me->done = 1;
+			break ;
+		}
 	}
-	exit (0);
+	exit(0);
 }
 
 t_philo		*init_philo(int name, t_philo *prev, char **args)
@@ -126,10 +183,10 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
-	philo->action = 1;
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;
+	philo->done = 0;
 	philo->next = NULL;
 	philo->prev = prev;
 	if (prev)
@@ -146,7 +203,6 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	sem_t			*game;
 	int		i;
 
-	// printf("----------------- Creating simulation ---------------\n");
 	i = 0;
 	head = NULL;
 	tmp = NULL;
@@ -168,7 +224,6 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
-	// printf("----------------- Starting simulation ---------------\n");
 	return (head);
 }
 
@@ -181,40 +236,50 @@ t_table		*init_table(char **args)
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
+	table->end = 0;
 	table->philos = create_philos(table->persons, table, args);
 	return (table);
 }
 
 void	create_lifes(t_table *table)
 {
-	t_philo 	*tmp;
-	pid_t		pids[table->persons];
-	int			i;
-	int			pid;
+	int				i;
+	int				pid;
+	t_philo 		*tmp;
+	pthread_t		checker;
+	struct timeval	current_time;
+	pid_t			pids[table->persons];
 
 	i = 0;
 	tmp = table->philos;
 	sem_wait(table->game);
+	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
+		tmp->start_time = current_time;
 		pid = fork();
 		if (pid == 0)
+		{
 			ft_philo_life(tmp);
+			exit(0);
+		}
 		tmp = tmp->next;
 		pids[i++] = 1;
 		if (tmp->head)
 			break ;
-		usleep(50);
+		usleep(45);
 	}
-	i = -1;
+	pthread_create(&checker, NULL, &game_checker, (void *)table);
+	table->checker = checker;
 	sem_wait(table->game);
-	sem_wait(table->philos->print);
+	i = -1;
 	while (++i < table->persons)
 		kill(pids[i], 0);
-	finish_simulation(table);
+	// sem_wait(table->game);
+	// finish_simulation(table, 0);
 }
 
-void	finish_simulation(t_table *table)
+void	finish_simulation(t_table *table, int death)
 {
 	t_philo	*curr;
 	t_philo	*tmp;
@@ -228,12 +293,13 @@ void	finish_simulation(t_table *table)
     	sem_post(curr->sem);
 		table->forks++;
 	}
-	sem_close(curr->sem);
+    sem_post(curr->print); 
     sem_close(curr->print); 
+	// sem_close(curr->sem);
+    // sem_close(table->game); 
 	sem_unlink("table_sem");
 	sem_unlink("print_sem");
-    sem_close(table->game); 
-	sem_unlink("game_sem");
+	// sem_unlink("game_sem");
 	while (curr)
 	{
 		pthread_detach(curr->checker);
@@ -241,8 +307,13 @@ void	finish_simulation(t_table *table)
 		ft_del(curr);
 		curr = tmp;
 	}
-	ft_del(table);
-	exit(0);
+	// ft_del(table);
+	ft_putstr("End of simulation: ");
+	if (death)
+		ft_putstr("one of the philosophers died\n");
+	else
+		ft_putstr("philosophers reached the eat limit\n");
+	// exit(0);
 }
 
 int		valid_args(int total, char **args)
@@ -263,7 +334,6 @@ sem_t	*init_semaphore(int total, char *name)
 	sem_t	*sem;
 
 	sem_unlink(name);
-	sem = malloc(sizeof(sem_t));
 	sem = sem_open(name, O_CREAT, 0666, total);
 	return (sem);
 }

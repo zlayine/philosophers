@@ -2,3 +2,5 @@
 .DS_Store
 exam
 philosophers
+*.dSYM*
+.vscode
