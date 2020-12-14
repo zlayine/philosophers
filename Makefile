@@ -40,7 +40,7 @@ clean:
 	@rm -rf $(OBJ)
 
 fclean: clean
-	@rm -rf $(PHILO_ONE) $(PHILO_TWO)
+	# @rm -rf $(PHILO_ONE) $(PHILO_TWO)
 
 re: fclean all
 
