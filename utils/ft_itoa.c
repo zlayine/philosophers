@@ -1,4 +1,4 @@
-#include "../philo.h"
+#include "utils.h"
 
 char	*ft_itoa(long n)
 {

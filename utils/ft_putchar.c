@@ -1,4 +1,4 @@
-#include "../philo.h"
+#include "utils.h"
 
 void		ft_putchar(char c)
 {

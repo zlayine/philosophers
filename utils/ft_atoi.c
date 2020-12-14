@@ -1,4 +1,4 @@
-#include "../philo.h"
+#include "utils.h"
 
 static int	ft_check(long n, int sign)
 {
