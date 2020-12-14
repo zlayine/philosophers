@@ -95,8 +95,14 @@ void	*game_checker(void *arg)
 		{
 			done++;
 			philo->die = -1;
-		} else if (table->end)
+		}
+		else if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
+		{
+			philo->die = 1;
+			sem_wait(philo->print);
+			print_status(philo, DIE_ACTION);
 			break ;
+		}
 		philo = philo->next;
 		if (done == table->persons)
 			break ;
@@ -105,31 +111,31 @@ void	*game_checker(void *arg)
 	return (NULL);
 }
 
-void	*ft_philo_checker(void *arg)
-{
-	t_philo	*philo;
+// void	*ft_philo_checker(void *arg)
+// {
+// 	t_philo	*philo;
 
-	philo = (t_philo*)arg;
-	while (1)
-	{
-		if (philo->die)
-			break ;
-		if (philo->eat_num == 0)
-		{
-			philo->die = -1;
-			sem_post(philo->table->game);
-			break;
-		}
-		else if (get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
-		{
-			philo->die = 1;
-			print_status(philo, DIE_ACTION);
-			sem_post(philo->table->game);
-			break ;
-		}
-	}
-	return (NULL);
-}
+// 	philo = (t_philo*)arg;
+// 	while (1)
+// 	{
+// 		if (philo->die)
+// 			break ;
+// 		if (philo->eat_num == 0)
+// 		{
+// 			philo->die = -1;
+// 			sem_post(philo->table->game);
+// 			break;
+// 		}
+// 		else if (get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
+// 		{
+// 			philo->die = 1;
+// 			print_status(philo, DIE_ACTION);
+// 			sem_post(philo->table->game);
+// 			break ;
+// 		}
+// 	}
+// 	return (NULL);
+// }
 
 // void	*ft_philo_checker(void *arg)
 // {
@@ -158,8 +164,8 @@ void	ft_philo_life(t_philo *me)
 
 	life = 1;
 	me->start = get_current_time(1, me->start_time);
-	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	me->checker = checker;
+	// pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
+	// me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
@@ -264,7 +270,7 @@ void	create_lifes(t_table *table)
 			exit(0);
 		}
 		tmp = tmp->next;
-		pids[i++] = 1;
+		pids[i++] = pid;
 		if (tmp->head)
 			break ;
 		usleep(45);
@@ -276,7 +282,7 @@ void	create_lifes(t_table *table)
 	while (++i < table->persons)
 		kill(pids[i], 0);
 	// sem_wait(table->game);
-	// finish_simulation(table, 0);
+	finish_simulation(table, 0);
 }
 
 void	finish_simulation(t_table *table, int death)
@@ -295,11 +301,11 @@ void	finish_simulation(t_table *table, int death)
 	}
     sem_post(curr->print); 
     sem_close(curr->print); 
-	// sem_close(curr->sem);
-    // sem_close(table->game); 
+	sem_close(curr->sem);
+    sem_close(table->game); 
 	sem_unlink("table_sem");
 	sem_unlink("print_sem");
-	// sem_unlink("game_sem");
+	sem_unlink("game_sem");
 	while (curr)
 	{
 		pthread_detach(curr->checker);
@@ -307,13 +313,13 @@ void	finish_simulation(t_table *table, int death)
 		ft_del(curr);
 		curr = tmp;
 	}
-	// ft_del(table);
+	ft_del(table);
 	ft_putstr("End of simulation: ");
 	if (death)
 		ft_putstr("one of the philosophers died\n");
 	else
 		ft_putstr("philosophers reached the eat limit\n");
-	// exit(0);
+	exit(0);
 }
 
 int		valid_args(int total, char **args)
