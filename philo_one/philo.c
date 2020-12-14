@@ -2,10 +2,7 @@
 
 void	print_status(t_philo *philo, int action)
 {
-	
-	action != 5 ? pthread_mutex_lock(philo->print) : 0;
-	// ft_putstr(ft_itoa(philo->start));
-	// ft_putchar(' ');
+	pthread_mutex_lock(philo->print);
 	ft_putstr(ft_itoa(get_current_time(0)));
 	ft_putchar(' ');
 	ft_putstr(ft_itoa(philo->name));
@@ -21,7 +18,7 @@ void	print_status(t_philo *philo, int action)
 	else if (action == DIE_ACTION)
 		ft_putstr("died");
 	ft_putchar('\n');
-	action != 5 ? pthread_mutex_unlock(philo->print) : 0;
+	pthread_mutex_unlock(philo->print);
 }
 
 long	get_current_time(int micro)
@@ -29,7 +26,6 @@ long	get_current_time(int micro)
 	struct timeval current_time;
 
 	gettimeofday(&current_time, NULL);
-	// printf("S: %ld | MS: %ld\n ", current_time.tv_sec, current_time.tv_sec * 100000L + current_time.tv_usec);
 	if (!micro)
 		return ((current_time.tv_sec * 100000L + current_time.tv_usec) / 1000);
 	else
@@ -78,14 +74,13 @@ void	*ft_philo_checker(void *arg)
 		if (philo->eat_num == 0)
 		{
 			pthread_mutex_lock(philo->print);
-			printf("Simulation stops here %d\n", philo->name);
 			break;
 		}
 		if (get_current_time(1) > philo->start + (philo->die_time * 1000))
 		{
-			pthread_mutex_lock(philo->print);
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
+			pthread_mutex_lock(philo->print);
 			break ;
 		}
 	}
@@ -135,7 +130,6 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 		philo->l_fork = prev->r_fork;
 		prev->next = philo;
 	}
-	// printf("Philo %d created\n", name);
 	return (philo);
 }
 
@@ -156,7 +150,6 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	pthread_mutex_t	*print;
 	int		i;
 
-	// printf("----------------- Creating simulation ---------------\n");
 	i = 0;
 	head = NULL;
 	tmp = NULL;
@@ -178,7 +171,6 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
-	// printf("----------------- Starting simulation ---------------\n");
 	return (head);
 }
 
@@ -207,8 +199,7 @@ void	create_lifes(t_table *table)
 	{
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
 		tmp = tmp->next;
-		tids[i] = tmp->thrd;
-		i++;
+		tids[i++] = tmp->thrd;
 		if (tmp->head)
 			break ;
 		usleep(100);
@@ -226,21 +217,18 @@ void	finish_simulation(t_table *table)
 
 	curr = table->philos;
 	i = -1;
-
 	while (++i < table->persons)
 		pthread_mutex_destroy(&curr->mutex[i]);
 	pthread_mutex_destroy(curr->print);
-	// ft_del(curr->print);
-	// ft_del(curr->mutex);
-	// curr->prev->next = NULL;
-	// while (curr)
-	// {
-	// 	pthread_detach(curr->thrd);
-	// 	tmp = curr->next;
-	// 	ft_del(curr);
-	// 	curr = tmp;
-	// }
-	// ft_del(table);
+	curr->prev->next = NULL;
+	while (curr)
+	{
+		pthread_detach(curr->thrd);
+		tmp = curr->next;
+		ft_del(curr);
+		curr = tmp;
+	}
+	ft_del(table);
 	exit(0);
 }
 
@@ -263,7 +251,7 @@ int main(int argc, char **argv)
 
 	if (!valid_args(argc, ++argv))
 	{
-		printf("Please specify the required arguments\n");
+		ft_putstr("Please specify the required arguments\n");
 		return (1);
 	}
 	table = init_table(argv);

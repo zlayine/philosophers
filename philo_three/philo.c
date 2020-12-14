@@ -1,5 +1,4 @@
 #include "philo.h"
-#include <unistd.h> 
 
 void	print_status(t_philo *philo, int action)
 {

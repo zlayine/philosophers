@@ -1,11 +1,8 @@
 #include "philo.h"
-#include <unistd.h> 
 
 void	print_status(t_philo *philo, int action)
 {
 	sem_wait(philo->print);
-	// ft_putstr(ft_itoa(philo->start));
-	// ft_putchar(' ');
 	ft_putstr(ft_itoa(get_current_time(0)));
 	ft_putchar(' ');
 	ft_putstr(ft_itoa(philo->name));
@@ -29,7 +26,6 @@ long	get_current_time(int micro)
 	struct timeval current_time;
 
 	gettimeofday(&current_time, NULL);
-	// printf("S: %ld | MS: %ld\n ", current_time.tv_sec, current_time.tv_sec * 100000L + current_time.tv_usec);
 	if (!micro)
 		return ((current_time.tv_sec * 100000L + current_time.tv_usec) / 1000);
 	else
@@ -82,7 +78,6 @@ void	*ft_philo_checker(void *arg)
 		if (philo->eat_num == 0)
 		{
 			sem_wait(philo->print);
-			puts("Simulation stops here");
 			finish_simulation(philo->table);
 			break;
 		}
