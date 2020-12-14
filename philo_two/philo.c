@@ -2,10 +2,16 @@
 
 void	print_status(t_philo *philo, int action)
 {
+	char	*tmp;
+
 	sem_wait(philo->print);
-	ft_putstr(ft_itoa(get_current_time(0)));
+	tmp = ft_itoa(get_current_time(0, philo->start_time));
+	ft_putstr(tmp);
+	ft_del(tmp);
 	ft_putchar(' ');
-	ft_putstr(ft_itoa(philo->name));
+	tmp = ft_itoa(philo->name);
+	ft_putstr(tmp);
+	ft_del(tmp);
 	ft_putchar(' ');
 	if (action == FORK_ACTION)
 		ft_putstr("has taken a fork");
@@ -21,15 +27,17 @@ void	print_status(t_philo *philo, int action)
 	sem_post(philo->print);
 }
 
-long	get_current_time(int micro)
+long	get_current_time(int micro, struct timeval start_time)
 {
-	struct timeval current_time;
+	struct timeval	current_time;
+	int				time;
 
 	gettimeofday(&current_time, NULL);
+	time = ((current_time.tv_sec - start_time.tv_sec) * 1000000L + current_time.tv_usec) - start_time.tv_usec;
 	if (!micro)
-		return ((current_time.tv_sec * 100000L + current_time.tv_usec) / 1000);
+		return (time / 1000);
 	else
-		return (current_time.tv_sec * 100000L + current_time.tv_usec);
+		return (time);
 }
 
 void	ft_get_fork(t_philo *philo)
@@ -50,10 +58,10 @@ void	ft_drop_fork(t_philo *philo)
 
 void	ft_eat(t_philo *philo)
 {
+	philo->start = get_current_time(1, philo->start_time);
 	print_status(philo, EAT_ACTION);
 	usleep(philo->eat_time * 1000);
 	ft_drop_fork(philo);
-	philo->start = get_current_time(1);
 	if (philo->eat_num != -1)
 		philo->eat_num--;
 	ft_sleep(philo);
@@ -66,29 +74,49 @@ void	ft_sleep(t_philo *philo)
 	print_status(philo, THINK_ACTION);
 }
 
-void	*ft_philo_checker(void *arg)
+void	*game_checker(void *arg)
 {
-	t_philo	*philo;
+	t_table	*table;
+	t_philo *philo;
+	int		done;
 
-	philo = (t_philo*)arg;
+	table = (t_table*)arg;
+	philo = table->philos;
+	done = 0;
 	while (1)
 	{
-		if (philo->die)
-			break ;
-		if (philo->eat_num == 0)
+		if (philo->eat_num == 0 && philo->done && philo->die != -1)
 		{
-			sem_wait(philo->print);
-			finish_simulation(philo->table);
-			break;
+			done++;
+			philo->die = -1;
 		}
-		if (get_current_time(1) > philo->start + (philo->die_time * 1000))
+		philo = philo->next;
+		if (done == table->persons)
+			break ;
+	}
+	sem_wait(philo->print);
+	finish_simulation(philo->table, philo->die == 1);
+	return (NULL);
+}
+
+void	*ft_philo_checker(void *arg)
+{
+	t_philo *philo;
+	int		done;
+
+	philo = (t_philo*)arg;
+	done = 0;
+	while (1)
+	{
+		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
-			finish_simulation(philo->table);
 			break ;
 		}
 	}
+	sem_wait(philo->print);
+	finish_simulation(philo->table, philo->die == 1);
 	return (NULL);
 }
 
@@ -100,14 +128,17 @@ void	*ft_philo_life(void *arg)
 
 	me = (t_philo*)arg;
 	life = 1;
-	me->action = 1;
-	me->start = get_current_time(1);
+	me->start = get_current_time(1, me->start_time);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
 		ft_eat(me);
+		if (me->eat_num == 0)
+		{
+			me->done = 1;
+			break ;
+		}
 	}
 	return (NULL);
 }
@@ -122,15 +153,14 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
-	philo->action = 1;
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;
+	philo->done = 0;
 	philo->next = NULL;
 	philo->prev = prev;
 	if (prev)
 		prev->next = philo;
-	// printf("Philo %d created\n", name);
 	return (philo);
 }
 
@@ -142,7 +172,6 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	sem_t			*print;
 	int		i;
 
-	// printf("----------------- Creating simulation ---------------\n");
 	i = 0;
 	head = NULL;
 	tmp = NULL;
@@ -162,7 +191,6 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
-	// printf("----------------- Starting simulation ---------------\n");
 	return (head);
 }
 
@@ -181,28 +209,33 @@ t_table		*init_table(char **args)
 
 void	create_lifes(t_table *table)
 {
-	t_philo 	*tmp;
-	pthread_t	tids[table->persons];
-	int			i;
-
+	t_philo 		*tmp;
+	pthread_t		tids[table->persons];
+	int				i;
+	struct timeval	current_time;
+	pthread_t		checker;
 	i = 0;
 	tmp = table->philos;
+	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
+		tmp->start_time = current_time;
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
 		tmp = tmp->next;
 		tids[i] = tmp->thrd;
 		i++;
 		if (tmp->head)
 			break ;
-		usleep(150);
+		usleep(45);
 	}
 	i = 0;
 	while (i < table->persons)
 		pthread_join(tids[i++], NULL);
+	pthread_create(&checker, NULL, &game_checker, (void *)table);
+	pthread_join(checker, NULL);
 }
 
-void	finish_simulation(t_table *table)
+void	finish_simulation(t_table *table, int death)
 {
 	t_philo	*curr;
 	t_philo	*tmp;
@@ -211,29 +244,30 @@ void	finish_simulation(t_table *table)
 	i = -1;
 	curr = table->philos;
 	curr->prev->next = NULL;
+	while (table->forks < table->persons)
+	{
+    	sem_post(curr->sem);
+		table->forks++;
+	}
+	sem_close(curr->sem);
+    sem_close(curr->print); 
+	sem_unlink("table_sem");
+	sem_unlink("print_sem");
 	while (curr)
 	{
 		curr->die = 1;
 		pthread_detach(curr->thrd);
-		pthread_detach(curr->checker);
+		// pthread_detach(curr->checker);
 		tmp = curr->next;
 		// ft_del(curr);
 		curr = tmp;
 	}
-	while (table->forks < table->persons)
-	{
-    	sem_post(table->philos->sem);
-		table->forks++;
-	}
-	sem_close(table->philos->sem);
-    sem_close(table->philos->print); 
-	sem_unlink("table_sem");
-	sem_unlink("print_sem");
-
-	// ft_del(curr->print);
-	// ft_del(curr->mutex);
-	
-	// ft_del(table);
+	ft_del(table);
+	ft_putstr("End of simulation: ");
+	if (death)
+		ft_putstr("one of the philosophers died\n");
+	else
+		ft_putstr("philosophers reached the eat limit\n");
 	exit(0);
 }
 

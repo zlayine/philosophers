@@ -17,7 +17,6 @@ typedef struct	s_table
 
 typedef struct	s_philo
 {
-	int				action;
 	int				die_time;
 	int				eat_time;
 	int				sleep_time;

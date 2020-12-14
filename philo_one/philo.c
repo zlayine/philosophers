@@ -74,7 +74,6 @@ void	ft_eat(t_philo *philo)
 	if (philo->eat_num != -1)
 		philo->eat_num--;
 	ft_sleep(philo);
-	// printf("\n%ld %ld\n", get_current_time(1, philo->start_time), philo->start + (philo->die_time * 1000));
 }
 
 void	ft_sleep(t_philo *philo)
@@ -136,7 +135,6 @@ void	*ft_philo_life(void *arg)
 	pthread_t		checker;
 
 	me = (t_philo*)arg;
-	me->action = 1;
 	me->start = get_current_time(1, me->start_time);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
 	while (1)
@@ -162,7 +160,6 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
-	philo->action = 1;
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;
