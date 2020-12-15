@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:39:57 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:45:00 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,11 @@ void	*ft_philo_checker(void *arg)
 			philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
 			philo->die = 1;
+			pthread_mutex_lock(philo->print);
 			philo->table->end = !philo->table->end ?
 				philo->name : philo->table->end;
 			print_status(philo, DIE_ACTION);
-			pthread_mutex_lock(philo->print);
+			pthread_mutex_unlock(philo->print);
 			break ;
 		}
 	}
@@ -101,7 +102,6 @@ void	create_lifes(t_table *table)
 		tmp = tmp->next;
 		if (tmp->head)
 			break ;
-		// sleep(50);
 	}
 	pthread_join(checker, NULL);
 }

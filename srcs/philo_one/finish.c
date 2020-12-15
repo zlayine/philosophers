@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:41:15 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:42:18 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,8 @@ void	finish_simulation(t_table *table, int death)
 	else
 		ft_putstr("philosophers reached the eat limit\n");
 	pthread_mutex_unlock(curr->print);
-
 	free_simulation(curr, table->persons);
 	ft_del(table);
-	
 	exit(0);
 }
 
