@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/15 14:38:33 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:49:22 by zlayine          ###   ########.fr       */
+/*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
+/*   Updated: 2020/12/15 16:54:29 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,26 +33,28 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	return (philo);
 }
 
-t_philo		*create_philos(int i, t_table *table, char **args)
+t_philo		*create_philos(int total, t_table *table, char **args)
 {
 	t_philo			*head;
 	t_philo			*tmp;
 	sem_t			*sem;
 	sem_t			*print;
-	sem_t			*done;
+	int				i;
 
+	i = 0;
 	head = NULL;
+	tmp = NULL;
 	sem = init_semaphore(table->forks, "table_sem");
 	print = init_semaphore(1, "print_sem");
-	done = init_semaphore(0, "done_sem");
-	while (++i < table->forks)
+	while (i < total)
 	{
 		tmp = init_philo(i + 1, tmp, args);
 		tmp->table = table;
-		tmp->done = done;
 		tmp->sem = sem;
 		tmp->print = print;
-		head = head ? head : tmp;
+		if (!head)
+			head = tmp;
+		i++;
 	}
 	head->prev = tmp;
 	tmp->next = head;
@@ -64,16 +66,13 @@ t_table		*init_table(char **args)
 {
 	t_table	*table;
 	int		i;
-	sem_t	*game;
 
 	i = 0;
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
 	table->end = 0;
-	table->philos = create_philos(-1, table, args);
-	game = init_semaphore(1, "game_sem");
-	table->game = game;
+	table->philos = create_philos(table->persons, table, args);
 	return (table);
 }
 
@@ -82,6 +81,6 @@ sem_t		*init_semaphore(int total, char *name)
 	sem_t	*sem;
 
 	sem_unlink(name);
-	sem = sem_open(name, O_CREAT, 0666, total);
+	sem = sem_open(name, O_CREAT, 0777, total);
 	return (sem);
 }

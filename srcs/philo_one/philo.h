@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:18 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 14:34:10 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 17:06:25 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,6 @@ void			ft_sleep(t_philo *philo);
 void			ft_eat(t_philo *philo);
 void			ft_drop_fork(t_philo *philo);
 void			ft_get_fork(t_philo *philo);
+void			init_mutex(pthread_mutex_t *mutex, int t);
 
 #endif

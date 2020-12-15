@@ -4,6 +4,20 @@ PHILO_TWO = philo_two
 
 PHILO_THREE = philo_three
 
+SRCS_ONE = srcs/philo_one/inits.c \
+	srcs/philo_one/philo_actions.c \
+	srcs/philo_one/philo_checker.c
+
+SRCS_TWO = srcs/philo_two/inits.c \
+	srcs/philo_two/finish.c \
+	srcs/philo_two/philo_actions.c \
+	srcs/philo_two/philo_checker.c
+
+SRCS_THREE = srcs/philo_three/inits.c \
+	srcs/philo_three/philo_actions.c \
+	srcs/philo_three/finish.c \
+	srcs/philo_three/philo_checker.c
+
 UTILS = utils/ft_atoi.c \
 		utils/ft_del.c \
 		utils/ft_putchar.c \
@@ -23,17 +37,17 @@ PHILO_THREE_HEAD = srcs/philo_three/philo.h
 
 all: $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
-$(PHILO_ONE): $(OBJ) $(PHILO_ONE_MAIN) $(PHILO_ONE_HEAD)
-	@gcc $(PHILO_ONE_MAIN) $(OBJ) -o $(PHILO_ONE)
+$(PHILO_ONE): $(OBJ) $(SRCS_ONE) $(PHILO_ONE_MAIN) $(PHILO_ONE_HEAD)
+	@gcc $(PHILO_ONE_MAIN) $(SRCS_ONE) $(OBJ) -o $(PHILO_ONE)
 	@echo "SUCCESS!"
 
-$(PHILO_TWO): $(OBJ) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
-	@gcc $(PHILO_TWO_MAIN) $(OBJ) -o $(PHILO_TWO)
+$(PHILO_TWO): $(OBJ) $(SRCS_TWO) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
+	@gcc $(PHILO_TWO_MAIN) $(SRCS_TWO) $(OBJ) -o $(PHILO_TWO)
 	@echo "SUCCESS!"
 
 
-$(PHILO_THREE): $(OBJ) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
-	@gcc $(PHILO_THREE_MAIN) $(OBJ) -o $(PHILO_THREE)
+$(PHILO_THREE): $(OBJ) $(SRCS_THREE) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
+	@gcc $(PHILO_THREE_MAIN) $(SRCS_THREE) $(OBJ) -o $(PHILO_THREE)
 	@echo "SUCCESS!"
 
 %.o: %.c

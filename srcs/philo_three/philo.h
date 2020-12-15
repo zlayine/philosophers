@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 14:49:05 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 17:13:21 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,5 +83,8 @@ sem_t			*init_semaphore(int total, char *name);
 void			*game_checker(void *arg);
 void			free_simulation(t_philo *curr, int death);
 void			life_creation_end(t_table *table, pid_t *pids);
+t_table			*init_table(char **args);
+void			create_lifes(t_table *table);
+int				valid_args(int total, char **args);
 
 #endif
