@@ -25,19 +25,19 @@ all: $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
 $(PHILO_ONE): $(OBJ) $(PHILO_ONE_MAIN) $(PHILO_ONE_HEAD)
 	@gcc $(PHILO_ONE_MAIN) $(OBJ) -o $(PHILO_ONE)
-	@echo "SUCCESS! NO WWW ADDED"
+	@echo "SUCCESS!"
 
 $(PHILO_TWO): $(OBJ) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
 	@gcc $(PHILO_TWO_MAIN) $(OBJ) -o $(PHILO_TWO)
-	@echo "SUCCESS! NO WWW ADDED"
+	@echo "SUCCESS!"
 
 
 $(PHILO_THREE): $(OBJ) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
 	@gcc $(PHILO_THREE_MAIN) $(OBJ) -o $(PHILO_THREE)
-	@echo "SUCCESS! NO WWW ADDED"
+	@echo "SUCCESS!"
 
 %.o: %.c
-	@gcc -c $< -o $@ -I philo.h
+	@gcc -c -Wall -Wextra -Werror $< -o $@ -I philo.h
 
 clean:
 	@rm -rf $(OBJ)
