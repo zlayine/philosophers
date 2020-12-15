@@ -4,4 +4,4 @@ exam
 philosophers
 *.dSYM*
 .vscode
-philo_one
+philo*
