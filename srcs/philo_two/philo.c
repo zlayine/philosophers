@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:57:55 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:13:05 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void	print_status(t_philo *philo, int action)
 	char	*tmp;
 
 	sem_wait(philo->print);
+	// action != DIE_ACTION ? sem_wait(philo->print) : 0;
 	if (philo->table->end && action != 5)
 		return ;
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
@@ -38,6 +39,7 @@ void	print_status(t_philo *philo, int action)
 	else if (action == DIE_ACTION)
 		ft_putstr("died");
 	ft_putchar('\n');
+	// action != DIE_ACTION ? sem_post(philo->print) : 0;
 	sem_post(philo->print);
 }
 
@@ -57,13 +59,13 @@ long	get_current_time(int micro, struct timeval start_time)
 
 int		valid_args(int total, char **args)
 {
-	if (total < 2 || total > 6)
+	if (total < 5 || total > 6)
 	{
 		ft_putstr("Error: please specify the required arguments\n");
 		return (0);
 	}
 	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 ||
-		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || ft_atoi(args[0]) <= 0)
+		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || ft_atoi(args[4]) <= 0)
 	{
 		ft_putstr("Error: value of an argument is out of range\n");
 		return (0);

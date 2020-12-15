@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:52:15 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 17:57:52 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@ void	ft_get_fork(t_philo *philo)
 {
 	sem_wait(philo->sem);
 	print_status(philo, FORK_ACTION);
+	philo->table->forks--;
 	sem_wait(philo->sem);
 	print_status(philo, FORK_ACTION);
-	philo->table->forks -= 2;
+	philo->table->forks--;
 }
 
 void	ft_drop_fork(t_philo *philo)

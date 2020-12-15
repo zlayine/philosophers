@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:55:02 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:13:30 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	*game_checker(void *arg)
 	table = (t_table*)arg;
 	philo = table->philos;
 	done = 0;
-	while (1)
+	while (!table->end)
 	{
 		if (philo && philo->eat_num == 0 && philo->done && philo->die != -1)
 		{
@@ -43,13 +43,18 @@ void	*ft_philo_checker(void *arg)
 	t_philo *philo;
 
 	philo = (t_philo*)arg;
-	while (philo->table->end == 0)
+	while (philo && philo->table)
 	{
+		if (!philo || philo->die)
+			break ;
 		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1,
 			philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
+			if (philo->die)
+				break ;
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
+			// sem_wait(philo->print);
 			philo->table->end = !philo->table->end ?
 				philo->name : philo->table->end;
 			break ;

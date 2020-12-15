@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:58:49 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:13:19 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void	free_simulation(t_philo *curr)
 {
 	t_philo	*tmp;
 
-	sem_post(curr->print);
 	sem_close(curr->print);
 	sem_close(curr->sem);
 	sem_unlink("table_sem");
@@ -26,6 +25,7 @@ void	free_simulation(t_philo *curr)
 		curr->die = 1;
 		pthread_detach(curr->thrd);
 		pthread_detach(curr->checker);
+		curr->table = NULL;
 		tmp = curr->next;
 		ft_del(curr);
 		curr = tmp;

@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:52:29 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:37:38 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 17:18:42 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,13 +63,13 @@ void	finish_simulation(t_table *table, int death)
 
 int		valid_args(int total, char **args)
 {
-	if (total < 2 || total > 6)
+	if (total < 5 || total > 6)
 	{
 		ft_putstr("Error: please specify the required arguments\n");
 		return (0);
 	}
 	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 ||
-		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || ft_atoi(args[0]) <= 0)
+		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || ft_atoi(args[4]) <= 0)
 	{
 		ft_putstr("Error: value of an argument is out of range\n");
 		return (0);
