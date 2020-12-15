@@ -31,7 +31,7 @@ typedef struct	s_philo
 	int				head;
 	long			start;
 	int				die;
-	int				done;
+	sem_t			*done;
 	sem_t			*print;
 	sem_t			*sem;
 	pthread_t		checker;

@@ -4,11 +4,7 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	action != DIE_ACTION ? sem_wait(philo->print) : 0;
-	// if ((philo->table->end && action != 5) || (action == 5 && philo->table->end != philo->name))
-	// 	return ;
-	// if ((philo->table->end && action != 5))
-	// 	return ;
+	pthread_mutex_lock(philo->print);
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
 	ft_putstr(tmp);
 	ft_del(tmp);
@@ -28,9 +24,7 @@ void	print_status(t_philo *philo, int action)
 	else if (action == DIE_ACTION)
 		ft_putstr("died");
 	ft_putchar('\n');
-	// action != DIE_ACTION ? sem_post(philo->print) : 0;
-	action != DIE_ACTION ? sem_post(philo->print) : 0;
-	// sem_post(philo->print);
+	pthread_mutex_unlock(philo->print);
 }
 
 long	get_current_time(int micro, struct timeval start_time)
@@ -48,18 +42,27 @@ long	get_current_time(int micro, struct timeval start_time)
 
 void	ft_get_fork(t_philo *philo)
 {
-    sem_wait(philo->sem);
+	while (philo->r_fork == -1 || philo->l_fork == -1)
+		;
+	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
+	philo->next->l_fork = -1;
 	print_status(philo, FORK_ACTION);
-    sem_wait(philo->sem);
+	while (philo->r_fork == -1 || philo->l_fork == -1)
+		;
+	pthread_mutex_lock(&philo->mutex[philo->l_fork]);
+	philo->prev->r_fork = -1;
 	print_status(philo, FORK_ACTION);
-	philo->table->forks -= 2;
 }
 
 void	ft_drop_fork(t_philo *philo)
 {
-	sem_post(philo->sem);
-	sem_post(philo->sem);
-	philo->table->forks += 2;
+	pthread_mutex_unlock(&philo->mutex[philo->r_fork]);
+	philo->next->l_fork = philo->name - 1;
+	pthread_mutex_unlock(&philo->mutex[philo->l_fork]);
+	if (!philo->head)
+		philo->prev->r_fork = philo->name - 2;
+	else
+		philo->prev->r_fork = philo->table->forks - 1;
 }
 
 void	ft_eat(t_philo *philo)
@@ -91,81 +94,49 @@ void	*game_checker(void *arg)
 	done = 0;
 	while (1)
 	{
-		if (philo && philo->eat_num == 0 && philo->done && philo->die != -1)
+		if (philo->eat_num == 0 && philo->done && philo->die != -1)
 		{
 			done++;
 			philo->die = -1;
-		}
-		else if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
-		{
-			philo->die = 1;
-			sem_wait(philo->print);
-			print_status(philo, DIE_ACTION);
-			break ;
 		}
 		philo = philo->next;
 		if (done == table->persons)
 			break ;
 	}
-	sem_post(table->game);
+	pthread_mutex_lock(philo->print);
+	finish_simulation(philo->table, philo->die == 1);
 	return (NULL);
 }
 
-// void	*ft_philo_checker(void *arg)
-// {
-// 	t_philo	*philo;
-
-// 	philo = (t_philo*)arg;
-// 	while (1)
-// 	{
-// 		if (philo->die)
-// 			break ;
-// 		if (philo->eat_num == 0)
-// 		{
-// 			philo->die = -1;
-// 			sem_post(philo->table->game);
-// 			break;
-// 		}
-// 		else if (get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
-// 		{
-// 			philo->die = 1;
-// 			print_status(philo, DIE_ACTION);
-// 			sem_post(philo->table->game);
-// 			break ;
-// 		}
-// 	}
-// 	return (NULL);
-// }
-
-// void	*ft_philo_checker(void *arg)
-// {
-// 	t_philo *philo;
-
-// 	philo = (t_philo*)arg;
-// 	while (philo->table->end == 0)
-// 	{
-// 		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
-// 		{
-// 			philo->die = 1;
-// 			// sem_wait(philo->print);
-// 			print_status(philo, DIE_ACTION);
-// 			philo->table->end = philo->table->end == 0 ? philo->name : philo->table->end;
-// 			break ;
-// 		}
-// 	}
-// 	sem_post(philo->table->game);
-// 	return (NULL);
-// }
-
-void	ft_philo_life(t_philo *me)
+void	*ft_philo_checker(void *arg)
 {
-	pthread_t	checker;
-	int			life;
+	t_philo *philo;
+	int		done;
 
-	life = 1;
+	philo = (t_philo*)arg;
+	done = 0;
+	while (1)
+	{
+		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
+		{
+			philo->die = 1;
+			print_status(philo, DIE_ACTION);
+			break ;
+		}
+	}
+	pthread_mutex_lock(philo->print);
+	finish_simulation(philo->table, philo->die == 1);
+	return (NULL);
+}
+
+void	*ft_philo_life(void *arg)
+{
+	t_philo			*me;
+	pthread_t		checker;
+
+	me = (t_philo*)arg;
 	me->start = get_current_time(1, me->start_time);
-	// pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	// me->checker = checker;
+	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
 	while (1)
 	{
 		ft_get_fork(me);
@@ -176,7 +147,7 @@ void	ft_philo_life(t_philo *me)
 			break ;
 		}
 	}
-	exit(0);
+	return (NULL);
 }
 
 t_philo		*init_philo(int name, t_philo *prev, char **args)
@@ -195,38 +166,51 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->done = 0;
 	philo->next = NULL;
 	philo->prev = prev;
+	philo->r_fork = name - 1;
+	philo->l_fork = 0;
 	if (prev)
+	{
+		philo->l_fork = prev->r_fork;
 		prev->next = philo;
+	}
 	return (philo);
+}
+
+void		init_mutex(pthread_mutex_t *mutex, int t)
+{
+	int		i;
+
+	i = -1;
+	while (++i < t)
+		pthread_mutex_init(&mutex[i], NULL);
 }
 
 t_philo		*create_philos(int total, t_table *table, char **args)
 {
 	t_philo 		*head;
 	t_philo			*tmp;
-	sem_t			*sem;
-	sem_t			*print;
-	sem_t			*game;
+	pthread_mutex_t	*mutex;
+	pthread_mutex_t	*print;
 	int		i;
 
 	i = 0;
 	head = NULL;
 	tmp = NULL;
-	// if total = 0 may sigfault
-	sem = init_semaphore(table->forks, "table_sem");
-	print = init_semaphore(1, "print_sem");
-	game = init_semaphore(1, "game_sem");
-	table->game = game;
+	mutex = malloc(sizeof(pthread_mutex_t) * total);
+	print = malloc(sizeof(pthread_mutex_t));
+	init_mutex(mutex, total);
+	pthread_mutex_init(print, NULL);
 	while (i < total)
 	{
 		tmp = init_philo(i + 1, tmp, args);
 		tmp->table = table;
-		tmp->sem = sem;
+		tmp->mutex = mutex;
 		tmp->print = print;
 		if (!head)
 			head = tmp;
 		i++;
 	}
+	head->l_fork = tmp->r_fork;
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
@@ -242,47 +226,36 @@ t_table		*init_table(char **args)
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
-	table->end = 0;
 	table->philos = create_philos(table->persons, table, args);
 	return (table);
 }
 
 void	create_lifes(t_table *table)
 {
-	int				i;
-	int				pid;
 	t_philo 		*tmp;
-	pthread_t		checker;
+	pthread_t		tids[table->persons];
+	int				i;
 	struct timeval	current_time;
-	pid_t			pids[table->persons];
+	pthread_t		checker;
 
 	i = 0;
 	tmp = table->philos;
-	sem_wait(table->game);
 	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
-		pid = fork();
-		if (pid == 0)
-		{
-			ft_philo_life(tmp);
-			exit(0);
-		}
+		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
 		tmp = tmp->next;
-		pids[i++] = pid;
+		tids[i++] = tmp->thrd;
 		if (tmp->head)
 			break ;
-		usleep(45);
+		// usleep(45);
 	}
+	i = 0;
+	while (i < table->persons)
+		pthread_join(tids[i++], NULL);
 	pthread_create(&checker, NULL, &game_checker, (void *)table);
-	table->checker = checker;
-	sem_wait(table->game);
-	i = -1;
-	while (++i < table->persons)
-		kill(pids[i], 0);
-	// sem_wait(table->game);
-	finish_simulation(table, 0);
+	pthread_join(checker, NULL);
 }
 
 void	finish_simulation(t_table *table, int death)
@@ -291,24 +264,15 @@ void	finish_simulation(t_table *table, int death)
 	t_philo	*tmp;
 	int		i;
 
-	i = -1;
 	curr = table->philos;
+	i = -1;
+	while (++i < table->persons)
+		pthread_mutex_destroy(&curr->mutex[i]);
+	pthread_mutex_destroy(curr->print);
 	curr->prev->next = NULL;
-	while (table->forks < table->persons)
-	{
-    	sem_post(curr->sem);
-		table->forks++;
-	}
-    sem_post(curr->print); 
-    sem_close(curr->print); 
-	sem_close(curr->sem);
-    sem_close(table->game); 
-	sem_unlink("table_sem");
-	sem_unlink("print_sem");
-	sem_unlink("game_sem");
 	while (curr)
 	{
-		pthread_detach(curr->checker);
+		pthread_detach(curr->thrd);
 		tmp = curr->next;
 		ft_del(curr);
 		curr = tmp;
@@ -325,23 +289,16 @@ void	finish_simulation(t_table *table, int death)
 int		valid_args(int total, char **args)
 {
 	if (total < 2 || total > 6)
+	{
+		ft_putstr("Error: please specify the required arguments\n");
 		return (0);
-	// if (ft_atoi(args[0]) <= 0)
-	// {
-
-	// }
-	// if (ft_atoi(args[1]) <= 0)
-	// {}
+	}
+	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 || ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || ft_atoi(args[0]) <= 0)
+	{
+		ft_putstr("Error: value of an argument is out of range\n");
+		return (0);
+	}
 	return (1);
-}
-
-sem_t	*init_semaphore(int total, char *name)
-{
-	sem_t	*sem;
-
-	sem_unlink(name);
-	sem = sem_open(name, O_CREAT, 0666, total);
-	return (sem);
 }
 
 int main(int argc, char **argv)
@@ -349,10 +306,7 @@ int main(int argc, char **argv)
 	t_table	*table;
 
 	if (!valid_args(argc, ++argv))
-	{
-		printf("Please specify the required arguments\n");
 		return (1);
-	}
 	table = init_table(argv);
 	create_lifes(table);
 	return (0);

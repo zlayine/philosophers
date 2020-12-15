@@ -4,7 +4,9 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	pthread_mutex_lock(philo->print);
+	sem_wait(philo->print);
+	if (philo->table->end && action != 5)
+		return ;
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
 	ft_putstr(tmp);
 	ft_del(tmp);
@@ -24,7 +26,8 @@ void	print_status(t_philo *philo, int action)
 	else if (action == DIE_ACTION)
 		ft_putstr("died");
 	ft_putchar('\n');
-	pthread_mutex_unlock(philo->print);
+	// action != DIE_ACTION ? sem_post(philo->print) : 0;
+	sem_post(philo->print);
 }
 
 long	get_current_time(int micro, struct timeval start_time)
@@ -42,27 +45,18 @@ long	get_current_time(int micro, struct timeval start_time)
 
 void	ft_get_fork(t_philo *philo)
 {
-	while (philo->r_fork == -1 || philo->l_fork == -1)
-		;
-	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
-	philo->next->l_fork = -1;
+    sem_wait(philo->sem);
 	print_status(philo, FORK_ACTION);
-	while (philo->r_fork == -1 || philo->l_fork == -1)
-		;
-	pthread_mutex_lock(&philo->mutex[philo->l_fork]);
-	philo->prev->r_fork = -1;
+    sem_wait(philo->sem);
 	print_status(philo, FORK_ACTION);
+	philo->table->forks -= 2;
 }
 
 void	ft_drop_fork(t_philo *philo)
 {
-	pthread_mutex_unlock(&philo->mutex[philo->r_fork]);
-	philo->next->l_fork = philo->name - 1;
-	pthread_mutex_unlock(&philo->mutex[philo->l_fork]);
-	if (!philo->head)
-		philo->prev->r_fork = philo->name - 2;
-	else
-		philo->prev->r_fork = philo->table->forks - 1;
+	sem_post(philo->sem);
+	sem_post(philo->sem);
+	philo->table->forks += 2;
 }
 
 void	ft_eat(t_philo *philo)
@@ -94,49 +88,61 @@ void	*game_checker(void *arg)
 	done = 0;
 	while (1)
 	{
-		if (philo->eat_num == 0 && philo->done && philo->die != -1)
+		if (philo && philo->eat_num == 0 && philo->done && philo->die != -1)
 		{
 			done++;
 			philo->die = -1;
-		}
+		} else if (table->end)
+			break ;
 		philo = philo->next;
 		if (done == table->persons)
 			break ;
 	}
-	pthread_mutex_lock(philo->print);
-	finish_simulation(philo->table, philo->die == 1);
+	finish_simulation(philo->table, table->end > 0);
 	return (NULL);
 }
+
+// t_philo	*get_philosopher(int name, t_table *table)
+// {
+// 	t_philo *philo;
+
+// 	philo = table->philos;
+// 	while (philo)
+// 	{
+// 		if (philo->name == name)
+// 			break ;
+// 		philo = philo->next;
+// 	}
+// 	return (philo);
+// }
 
 void	*ft_philo_checker(void *arg)
 {
 	t_philo *philo;
-	int		done;
 
 	philo = (t_philo*)arg;
-	done = 0;
-	while (1)
+	while (philo->table->end == 0)
 	{
 		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1, philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
+			philo->table->end = !philo->table->end ? philo->name : philo->table->end;
 			break ;
 		}
 	}
-	pthread_mutex_lock(philo->print);
-	finish_simulation(philo->table, philo->die == 1);
 	return (NULL);
 }
 
 void	*ft_philo_life(void *arg)
 {
-	t_philo			*me;
-	pthread_t		checker;
+	t_philo		*me;
+	pthread_t	checker;
 
 	me = (t_philo*)arg;
 	me->start = get_current_time(1, me->start_time);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
+	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
@@ -166,51 +172,35 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->done = 0;
 	philo->next = NULL;
 	philo->prev = prev;
-	philo->r_fork = name - 1;
-	philo->l_fork = 0;
 	if (prev)
-	{
-		philo->l_fork = prev->r_fork;
 		prev->next = philo;
-	}
 	return (philo);
-}
-
-void		init_mutex(pthread_mutex_t *mutex, int t)
-{
-	int		i;
-
-	i = -1;
-	while (++i < t)
-		pthread_mutex_init(&mutex[i], NULL);
 }
 
 t_philo		*create_philos(int total, t_table *table, char **args)
 {
 	t_philo 		*head;
 	t_philo			*tmp;
-	pthread_mutex_t	*mutex;
-	pthread_mutex_t	*print;
+	sem_t			*sem;
+	sem_t			*print;
 	int		i;
 
 	i = 0;
 	head = NULL;
 	tmp = NULL;
-	mutex = malloc(sizeof(pthread_mutex_t) * total);
-	print = malloc(sizeof(pthread_mutex_t));
-	init_mutex(mutex, total);
-	pthread_mutex_init(print, NULL);
+	// if total = 0 may sigfault
+	sem = init_semaphore(table->forks, "table_sem");
+	print = init_semaphore(1, "print_sem");
 	while (i < total)
 	{
 		tmp = init_philo(i + 1, tmp, args);
 		tmp->table = table;
-		tmp->mutex = mutex;
+		tmp->sem = sem;
 		tmp->print = print;
 		if (!head)
 			head = tmp;
 		i++;
 	}
-	head->l_fork = tmp->r_fork;
 	head->prev = tmp;
 	tmp->next = head;
 	head->head = 1;
@@ -226,17 +216,18 @@ t_table		*init_table(char **args)
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
+	table->end = 0;
 	table->philos = create_philos(table->persons, table, args);
 	return (table);
 }
 
 void	create_lifes(t_table *table)
 {
-	t_philo 		*tmp;
-	pthread_t		tids[table->persons];
 	int				i;
-	struct timeval	current_time;
+	t_philo 		*tmp;
 	pthread_t		checker;
+	struct timeval	current_time;
+	pthread_t		tids[table->persons];
 
 	i = 0;
 	tmp = table->philos;
@@ -249,12 +240,11 @@ void	create_lifes(t_table *table)
 		tids[i++] = tmp->thrd;
 		if (tmp->head)
 			break ;
-		usleep(45);
+		// usleep(45);
 	}
 	i = 0;
-	while (i < table->persons)
-		pthread_join(tids[i++], NULL);
 	pthread_create(&checker, NULL, &game_checker, (void *)table);
+	table->checker = checker;
 	pthread_join(checker, NULL);
 }
 
@@ -262,21 +252,34 @@ void	finish_simulation(t_table *table, int death)
 {
 	t_philo	*curr;
 	t_philo	*tmp;
+	sem_t	*print;
+
 	int		i;
 
-	curr = table->philos;
 	i = -1;
-	while (++i < table->persons)
-		pthread_mutex_destroy(&curr->mutex[i]);
-	pthread_mutex_destroy(curr->print);
+	curr = table->philos;
 	curr->prev->next = NULL;
+	print = curr->print;
+	while (table->forks < table->persons)
+	{
+    	sem_post(curr->sem);
+		table->forks++;
+	}
+    sem_post(curr->print); 
+    sem_close(curr->print); 
+	sem_close(curr->sem);
+	sem_unlink("table_sem");
+	sem_unlink("print_sem");
 	while (curr)
 	{
+		curr->die = 1;
 		pthread_detach(curr->thrd);
+		pthread_detach(curr->checker);
 		tmp = curr->next;
 		ft_del(curr);
 		curr = tmp;
 	}
+	pthread_detach(table->checker);
 	ft_del(table);
 	ft_putstr("End of simulation: ");
 	if (death)
@@ -299,6 +302,15 @@ int		valid_args(int total, char **args)
 		return (0);
 	}
 	return (1);
+}
+
+sem_t	*init_semaphore(int total, char *name)
+{
+	sem_t	*sem;
+
+	sem_unlink(name);
+	sem = sem_open(name, O_CREAT, 0777, total);
+	return (sem);
 }
 
 int main(int argc, char **argv)
