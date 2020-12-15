@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:46:22 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:47:09 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	print_status(t_philo *philo, int action)
 	if ((philo->table->end && action != 5) ||
 		(action == 5 && philo->table->end != philo->name))
 		return ;
-	sem_wait(philo->print);
+	action != 5 ? sem_wait(philo->print) : 0;
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
 	ft_putstr(tmp);
 	ft_del(tmp);
@@ -38,7 +38,7 @@ void	print_status(t_philo *philo, int action)
 		ft_putstr("is thinking\n");
 	else if (action == DIE_ACTION)
 		ft_putstr("died\n");
-	sem_post(philo->print);
+	action != 5 ? sem_post(philo->print) : 0;
 }
 
 long	get_current_time(int micro, struct timeval start_time)

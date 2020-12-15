@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:39:32 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:47:47 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,11 @@ void	*ft_philo_checker(void *arg)
 			philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
 			philo->die = 1;
+			sem_wait(philo->print);
 			philo->table->end = !philo->table->end ?
 				philo->name : philo->table->end;
 			print_status(philo, DIE_ACTION);
+			sem_post(philo->print);
 			break ;
 		}
 	}

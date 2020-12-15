@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:52:29 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:46:28 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:53:47 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,10 @@ void	finish_simulation(t_table *table, int death)
 	i = -1;
 	curr = table->philos;
 	curr->prev->next = NULL;
+	if (death != 2 && death != 0)
+		ft_putstr("End of simulation: one of the philosophers died\n");
+	else if (death != 2)
+		ft_putstr("End of simulation: philosophers reached the eat limit\n");
 	while (table->forks < table->persons)
 	{
 		sem_post(curr->sem);
@@ -52,11 +56,6 @@ void	finish_simulation(t_table *table, int death)
 	if (death != 2)
 	{
 		ft_del(table);
-		ft_putstr("End of simulation: ");
-		if (death)
-			ft_putstr("one of the philosophers died\n");
-		else
-			ft_putstr("philosophers reached the eat limit\n");
 		exit(0);
 	}
 }
