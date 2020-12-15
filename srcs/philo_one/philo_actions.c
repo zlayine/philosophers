@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:50 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 14:25:24 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:07:01 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,16 @@
 
 void	ft_get_fork(t_philo *philo)
 {
-	while (philo->r_fork == -1 || philo->l_fork == -1)
-		;
 	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
-	philo->next->l_fork = -1;
 	print_status(philo, FORK_ACTION);
-	while (philo->r_fork == -1 || philo->l_fork == -1)
-		;
 	pthread_mutex_lock(&philo->mutex[philo->l_fork]);
-	philo->prev->r_fork = -1;
 	print_status(philo, FORK_ACTION);
 }
 
 void	ft_drop_fork(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->mutex[philo->r_fork]);
-	philo->next->l_fork = philo->name - 1;
 	pthread_mutex_unlock(&philo->mutex[philo->l_fork]);
-	if (!philo->head)
-		philo->prev->r_fork = philo->name - 2;
-	else
-		philo->prev->r_fork = philo->table->forks - 1;
 }
 
 void	ft_eat(t_philo *philo)

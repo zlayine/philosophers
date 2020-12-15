@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 14:34:42 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:02:38 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,10 @@ void	*ft_philo_checker(void *arg)
 
 	philo = (t_philo*)arg;
 	done = 0;
-	while (1)
+	while (philo)
 	{
+		if (!philo || philo->die)
+			break ;
 		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1,
 			philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
@@ -67,6 +69,7 @@ void	*ft_philo_life(void *arg)
 	me = (t_philo*)arg;
 	me->start = get_current_time(1, me->start_time);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
+	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);

@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:59 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:46:13 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:03:20 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,34 +51,6 @@ long	get_current_time(int micro, struct timeval start_time)
 		return (time / 1000);
 	else
 		return (time);
-}
-
-void	finish_simulation(t_table *table, int death)
-{
-	t_philo	*curr;
-	t_philo	*tmp;
-	int		i;
-
-	curr = table->philos;
-	i = -1;
-	while (++i < table->persons)
-		pthread_mutex_destroy(&curr->mutex[i]);
-	pthread_mutex_destroy(curr->print);
-	curr->prev->next = NULL;
-	while (curr)
-	{
-		pthread_detach(curr->thrd);
-		tmp = curr->next;
-		ft_del(curr);
-		curr = tmp;
-	}
-	ft_del(table);
-	ft_putstr("End of simulation: ");
-	if (death)
-		ft_putstr("one of the philosophers died\n");
-	else
-		ft_putstr("philosophers reached the eat limit\n");
-	exit(0);
 }
 
 int		valid_args(int total, char **args)

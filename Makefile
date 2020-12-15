@@ -5,6 +5,7 @@ PHILO_TWO = philo_two
 PHILO_THREE = philo_three
 
 SRCS_ONE = srcs/philo_one/inits.c \
+	srcs/philo_one/finish.c \
 	srcs/philo_one/philo_actions.c \
 	srcs/philo_one/philo_checker.c
 

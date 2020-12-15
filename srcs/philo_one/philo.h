@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:18 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:44:41 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:02:46 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct	s_philo
 	struct timeval	start_time;
 	int				die;
 	pthread_t		thrd;
+	pthread_t		checker;
 	struct s_table	*table;
 	struct s_philo	*next;
 	struct s_philo	*prev;
