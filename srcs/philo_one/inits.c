@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:26:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 17:09:38 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:28:41 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ t_table		*init_table(char **args)
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
+	table->end = 0;
 	table->philos = create_philos(table->persons, table, args);
 	return (table);
 }

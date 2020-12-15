@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:59 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 19:03:20 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:28:09 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
+	if ((philo->table->end && action != 5) ||
+		(action == 5 && philo->table->end != philo->name))
+		return ;
 	pthread_mutex_lock(philo->print);
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
 	ft_putstr(tmp);
@@ -26,16 +29,15 @@ void	print_status(t_philo *philo, int action)
 	ft_del(tmp);
 	ft_putchar(' ');
 	if (action == FORK_ACTION)
-		ft_putstr("has taken a fork");
+		ft_putstr("has taken a fork\n");
 	else if (action == EAT_ACTION)
-		ft_putstr("is eating");
+		ft_putstr("is eating\n");
 	else if (action == SLEEP_ACTION)
-		ft_putstr("is sleeping");
+		ft_putstr("is sleeping\n");
 	else if (action == THINK_ACTION)
-		ft_putstr("is thinking");
+		ft_putstr("is thinking\n");
 	else if (action == DIE_ACTION)
-		ft_putstr("died");
-	ft_putchar('\n');
+		ft_putstr("died\n");
 	pthread_mutex_unlock(philo->print);
 }
 

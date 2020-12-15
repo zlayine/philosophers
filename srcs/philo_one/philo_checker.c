@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 19:02:38 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:39:57 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,20 @@ void	*game_checker(void *arg)
 	table = (t_table*)arg;
 	philo = table->philos;
 	done = 0;
-	while (1)
+	while (!table->end)
 	{
-		if (philo->eat_num == 0 && philo->done && philo->die != -1)
+		if (philo && philo->eat_num == 0 && philo->done && philo->die != -1)
 		{
 			done++;
 			philo->die = -1;
 		}
+		else if (table->end)
+			break ;
 		philo = philo->next;
 		if (done == table->persons)
 			break ;
 	}
-	pthread_mutex_lock(philo->print);
-	finish_simulation(philo->table, philo->die == 1);
+	finish_simulation(philo->table, table->end != 0);
 	return (NULL);
 }
 
@@ -44,7 +45,7 @@ void	*ft_philo_checker(void *arg)
 
 	philo = (t_philo*)arg;
 	done = 0;
-	while (philo)
+	while (philo && philo->table)
 	{
 		if (!philo || philo->die)
 			break ;
@@ -52,12 +53,13 @@ void	*ft_philo_checker(void *arg)
 			philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
 			philo->die = 1;
+			philo->table->end = !philo->table->end ?
+				philo->name : philo->table->end;
 			print_status(philo, DIE_ACTION);
+			pthread_mutex_lock(philo->print);
 			break ;
 		}
 	}
-	pthread_mutex_lock(philo->print);
-	finish_simulation(philo->table, philo->die == 1);
 	return (NULL);
 }
 
@@ -86,26 +88,20 @@ void	*ft_philo_life(void *arg)
 void	create_lifes(t_table *table)
 {
 	t_philo			*tmp;
-	pthread_t		tids[table->persons];
-	int				i;
 	struct timeval	current_time;
 	pthread_t		checker;
 
-	i = 0;
 	tmp = table->philos;
 	gettimeofday(&current_time, NULL);
+	pthread_create(&checker, NULL, &game_checker, (void *)table);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
 		tmp = tmp->next;
-		tids[i++] = tmp->thrd;
 		if (tmp->head)
 			break ;
+		// sleep(50);
 	}
-	i = 0;
-	while (i < table->persons)
-		pthread_join(tids[i++], NULL);
-	pthread_create(&checker, NULL, &game_checker, (void *)table);
 	pthread_join(checker, NULL);
 }

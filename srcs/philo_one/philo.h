@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:18 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 19:02:46 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 19:52:33 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ typedef struct	s_table
 {
 	int				persons;
 	int				forks;
+	int				end;
 	struct s_philo	*philos;
 }				t_table;
 

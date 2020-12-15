@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:25:38 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 20:39:32 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	create_lifes(t_table *table)
 	i = 0;
 	tmp = table->philos;
 	gettimeofday(&current_time, NULL);
+	pthread_create(&checker, NULL, &game_checker, (void *)table);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
@@ -103,7 +104,6 @@ void	create_lifes(t_table *table)
 			break ;
 	}
 	i = 0;
-	pthread_create(&checker, NULL, &game_checker, (void *)table);
 	table->checker = checker;
 	pthread_join(checker, NULL);
 }
