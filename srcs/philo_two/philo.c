@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:13:05 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:30:06 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,9 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	sem_wait(philo->print);
-	// action != DIE_ACTION ? sem_wait(philo->print) : 0;
-	if (philo->table->end && action != 5)
+	if ((philo->table->end && action != 5) || (action == 5 && philo->table->end != philo->name))
 		return ;
+	sem_wait(philo->print);
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
 	ft_putstr(tmp);
 	ft_del(tmp);
@@ -39,7 +38,6 @@ void	print_status(t_philo *philo, int action)
 	else if (action == DIE_ACTION)
 		ft_putstr("died");
 	ft_putchar('\n');
-	// action != DIE_ACTION ? sem_post(philo->print) : 0;
 	sem_post(philo->print);
 }
 

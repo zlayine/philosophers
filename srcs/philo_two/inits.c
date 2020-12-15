@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:54:29 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:28:00 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,6 @@ sem_t		*init_semaphore(int total, char *name)
 	sem_t	*sem;
 
 	sem_unlink(name);
-	sem = sem_open(name, O_CREAT, 0777, total);
+	sem = sem_open(name, O_CREAT, 0666, total);
 	return (sem);
 }

@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:13:30 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:25:38 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	*game_checker(void *arg)
 		if (done == table->persons)
 			break ;
 	}
-	finish_simulation(philo->table, table->end > 0);
+	finish_simulation(philo->table, table->end);
 	return (NULL);
 }
 
@@ -50,13 +50,10 @@ void	*ft_philo_checker(void *arg)
 		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1,
 			philo->start_time) > philo->start + (philo->die_time * 1000))
 		{
-			if (philo->die)
-				break ;
 			philo->die = 1;
-			print_status(philo, DIE_ACTION);
-			// sem_wait(philo->print);
 			philo->table->end = !philo->table->end ?
 				philo->name : philo->table->end;
+			print_status(philo, DIE_ACTION);
 			break ;
 		}
 	}
