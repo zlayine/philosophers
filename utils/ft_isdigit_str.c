@@ -1,26 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.h                                            :+:      :+:    :+:   */
+/*   ft_isdigit_str.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/15 17:14:31 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:43:38 by zlayine          ###   ########.fr       */
+/*   Created: 2020/12/15 18:41:53 by zlayine           #+#    #+#             */
+/*   Updated: 2020/12/15 18:43:26 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILS_H
-# define UTILS_H
+#include "utils.h"
 
-# include <unistd.h>
-# include <stdlib.h>
+int		ft_is_strdig(char *str)
+{
+	int i;
 
-int			ft_atoi(const char *str);
-void		ft_putstr(char *s);
-char		*ft_itoa(long n);
-void		ft_putchar(char c);
-void		ft_del(void *data);
-int			ft_is_strdig(char *str);
-
-#endif
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
+}

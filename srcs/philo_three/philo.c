@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:39:14 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:49:30 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:50:54 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,11 @@ void	create_lifes(t_table *table)
 			pids[i++] = pid;
 			if (tmp->head)
 				break ;
+		}
+		else if (pid < 0)
+		{
+			ft_putstr("fork error");
+			exit(1);
 		}
 	}
 	life_creation_end(table, pids);

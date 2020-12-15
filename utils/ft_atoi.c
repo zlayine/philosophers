@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:14:17 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 17:14:18 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:37:11 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int			ft_atoi(const char *str)
 	i = 0;
 	n = 0;
 	sign = 1;
+	if (!str)
+		return (0);
 	while (str[i] == '\t' || str[i] == ' ' || str[i] == '\n' ||
 		str[i] == '\v' || str[i] == '\r' || str[i] == '\f')
 		i++;

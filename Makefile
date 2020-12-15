@@ -22,6 +22,7 @@ UTILS = utils/ft_atoi.c \
 		utils/ft_del.c \
 		utils/ft_putchar.c \
 		utils/ft_putstr.c \
+		utils/ft_isdigit_str.c \
 		utils/ft_itoa.c
 
 OBJ = $(UTILS:.c=.o)

@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:30:06 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/15 18:46:22 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	if ((philo->table->end && action != 5) || (action == 5 && philo->table->end != philo->name))
+	if ((philo->table->end && action != 5) ||
+		(action == 5 && philo->table->end != philo->name))
 		return ;
 	sem_wait(philo->print);
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
@@ -28,16 +29,15 @@ void	print_status(t_philo *philo, int action)
 	ft_del(tmp);
 	ft_putchar(' ');
 	if (action == FORK_ACTION)
-		ft_putstr("has taken a fork");
+		ft_putstr("has taken a fork\n");
 	else if (action == EAT_ACTION)
-		ft_putstr("is eating");
+		ft_putstr("is eating\n");
 	else if (action == SLEEP_ACTION)
-		ft_putstr("is sleeping");
+		ft_putstr("is sleeping\n");
 	else if (action == THINK_ACTION)
-		ft_putstr("is thinking");
+		ft_putstr("is thinking\n");
 	else if (action == DIE_ACTION)
-		ft_putstr("died");
-	ft_putchar('\n');
+		ft_putstr("died\n");
 	sem_post(philo->print);
 }
 
@@ -62,8 +62,16 @@ int		valid_args(int total, char **args)
 		ft_putstr("Error: please specify the required arguments\n");
 		return (0);
 	}
+	if (!ft_is_strdig(args[0]) || !ft_is_strdig(args[1]) ||
+		!ft_is_strdig(args[2]) || !ft_is_strdig(args[3]) ||
+		(total == 6 && !ft_is_strdig(args[4])))
+	{
+		ft_putstr("Error: value of an arguments must be numbers only\n");
+		return (0);
+	}
 	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 ||
-		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || ft_atoi(args[4]) <= 0)
+		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || (total == 6 &&
+			ft_atoi(args[4]) <= 0))
 	{
 		ft_putstr("Error: value of an argument is out of range\n");
 		return (0);
