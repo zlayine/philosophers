@@ -286,6 +286,7 @@ void	finish_simulation(t_table *table, int death)
 	exit(0);
 }
 
+
 int		valid_args(int total, char **args)
 {
 	if (total < 2 || total > 6)
