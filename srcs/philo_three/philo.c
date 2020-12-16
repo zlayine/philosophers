@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:39:14 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:50:54 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/16 09:37:55 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,21 +87,13 @@ void	create_lifes(t_table *table)
 	while (tmp)
 	{
 		tmp->start_time = current_time;
-		pid = fork();
-		if (pid == 0)
-			ft_philo_life(tmp);
-		else if (pid > 0)
-		{
-			tmp = tmp->next;
-			pids[i++] = pid;
-			if (tmp->head)
-				break ;
-		}
-		else if (pid < 0)
-		{
-			ft_putstr("fork error");
+		pid = ft_philo_life(tmp);
+		if (pid < 0)
 			exit(1);
-		}
+		tmp = tmp->next;
+		pids[i++] = pid;
+		if (tmp->head)
+			break ;
 	}
 	life_creation_end(table, pids);
 }

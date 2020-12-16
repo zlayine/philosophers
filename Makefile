@@ -40,20 +40,20 @@ PHILO_THREE_HEAD = srcs/philo_three/philo.h
 all: $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
 $(PHILO_ONE): $(OBJ) $(SRCS_ONE) $(PHILO_ONE_MAIN) $(PHILO_ONE_HEAD)
-	@gcc -g $(PHILO_ONE_MAIN) $(SRCS_ONE) $(OBJ) -o $(PHILO_ONE)
+	@gcc $(PHILO_ONE_MAIN) $(SRCS_ONE) $(OBJ) -o $(PHILO_ONE)
 	@echo "PHILO ONE SUCCESS!"
 
 $(PHILO_TWO): $(OBJ) $(SRCS_TWO) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
-	@gcc -g $(PHILO_TWO_MAIN) $(SRCS_TWO) $(OBJ) -o $(PHILO_TWO)
+	@gcc $(PHILO_TWO_MAIN) $(SRCS_TWO) $(OBJ) -o $(PHILO_TWO)
 	@echo "PHILO TWO SUCCESS!"
 
 
 $(PHILO_THREE): $(OBJ) $(SRCS_THREE) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
-	@gcc -g $(PHILO_THREE_MAIN) $(SRCS_THREE) $(OBJ) -o $(PHILO_THREE)
+	@gcc $(PHILO_THREE_MAIN) $(SRCS_THREE) $(OBJ) -o $(PHILO_THREE)
 	@echo "PHILO THREE SUCCESS!"
 
 %.o: %.c
-	@gcc -c -g -Wall -Wextra -Werror $< -o $@ -I philo.h
+	@gcc -c -Wall -Wextra -Werror $< -o $@ -I philo.h
 
 clean:
 	@rm -rf $(OBJ)

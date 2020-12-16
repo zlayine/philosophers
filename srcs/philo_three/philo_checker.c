@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:38:30 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:53:05 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/16 09:37:42 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,25 +60,31 @@ void	*ft_philo_checker(void *arg)
 	return (NULL);
 }
 
-void	ft_philo_life(t_philo *me)
+int		ft_philo_life(t_philo *me)
 {
 	pthread_t	checker;
+	int			pid;
 
-	me->start = get_current_time(1, me->start_time);
-	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	me->checker = checker;
-	while (me)
+	pid = fork();
+	if (pid == 0)
 	{
-		ft_get_fork(me);
-		ft_eat(me);
-		if (me->eat_num == 0)
+		me->start = get_current_time(1, me->start_time);
+		pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
+		me->checker = checker;
+		while (me)
 		{
-			me->die = -1;
-			break ;
+			ft_get_fork(me);
+			ft_eat(me);
+			if (me->eat_num == 0)
+			{
+				me->die = -1;
+				break ;
+			}
+			if (me->die || me->table->end)
+				break ;
 		}
-		if (me->die || me->table->end)
-			break ;
+		pthread_join(checker, NULL);
+		exit(0);
 	}
-	pthread_join(checker, NULL);
-	exit(0);
+	return (pid);
 }

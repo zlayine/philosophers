@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:44:36 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/16 09:37:32 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ long			get_current_time(int micro, struct timeval start_time);
 int				ft_do_action(t_philo *philo);
 int				ft_action(t_philo *philo);
 void			check_life(t_philo *philo);
-void			ft_philo_life(t_philo *philo);
+int				ft_philo_life(t_philo *philo);
 t_philo			*init_philo(int name, t_philo *prev, char **args);
 t_philo			*create_philos(int total, t_table *table, char **args);
 t_table			*init_table(char **args);

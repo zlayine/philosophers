@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:47:09 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/16 09:24:40 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	if ((philo->table->end && action != 5) ||
+	if (philo->die || (philo->table->end && action != 5) ||
 		(action == 5 && philo->table->end != philo->name))
 		return ;
 	action != 5 ? sem_wait(philo->print) : 0;
