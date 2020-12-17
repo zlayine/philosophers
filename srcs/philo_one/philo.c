@@ -16,9 +16,10 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	if ((philo->table->end && action != 5) ||
-		(action == 5 && philo->table->end != philo->name))
-		return ;
+	// if ((philo->table->end && action != 5) ||
+	// 	(action == 5 && philo->table->end != philo->name))
+	// 	return ;
+	// action != 5 ? pthread_mutex_lock(philo->print) : 0;
 	action != 5 ? pthread_mutex_lock(philo->print) : 0;
 	tmp = ft_itoa(get_current_time(0, philo->start_time));
 	ft_putstr(tmp);

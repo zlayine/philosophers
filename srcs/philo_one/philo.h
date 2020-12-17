@@ -26,6 +26,7 @@ typedef struct	s_table
 	int				forks;
 	int				end;
 	struct s_philo	*philos;
+	pthread_mutex_t	*mtdie;
 }				t_table;
 
 typedef struct	s_philo
@@ -49,6 +50,7 @@ typedef struct	s_philo
 	int				r_fork;
 	pthread_mutex_t	*print;
 	pthread_mutex_t	*mutex;
+	pthread_mutex_t	*mtphilo;
 }				t_philo;
 
 # define FORK_ACTION 1
@@ -56,6 +58,7 @@ typedef struct	s_philo
 # define SLEEP_ACTION 3
 # define THINK_ACTION 4
 # define DIE_ACTION 5
+# define SIM_OVER 6
 
 int				ft_atoi(const char *str);
 void			ft_putstr(char *s);

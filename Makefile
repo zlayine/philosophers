@@ -28,7 +28,7 @@ UTILS = utils/ft_atoi.c \
 
 OBJ = $(UTILS:.c=.o)
 
-PHILO_ONE_MAIN = srcs/philo_one/philo.c
+PHILO_ONE_MAIN = srcs/philo_one/full.c
 PHILO_ONE_HEAD = srcs/philo_one/philo.h
 
 PHILO_TWO_MAIN = srcs/philo_two/philo.c
@@ -40,7 +40,8 @@ PHILO_THREE_HEAD = srcs/philo_three/philo.h
 all: $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
 $(PHILO_ONE): $(OBJ) $(SRCS_ONE) $(PHILO_ONE_MAIN) $(PHILO_ONE_HEAD)
-	@gcc $(PHILO_ONE_MAIN) $(SRCS_ONE) $(OBJ) -o $(PHILO_ONE)
+	# @gcc $(PHILO_ONE_MAIN) $(SRCS_ONE) $(OBJ) -o $(PHILO_ONE)
+	@gcc $(PHILO_ONE_MAIN) $(OBJ) -o $(PHILO_ONE)
 	@echo "PHILO ONE SUCCESS!"
 
 $(PHILO_TWO): $(OBJ) $(SRCS_TWO) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
