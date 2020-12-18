@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:06:07 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:30:58 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	print_status(t_philo *philo, int action)
 
 	sem_wait(philo->print);
 	if (philo->die == 2)
-		exit (0);
+		exit(0);
 	ft_putnbr(get_current_time(0, philo->start_time));
 	ft_putchar(' ');
 	if (action != 6)

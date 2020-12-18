@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 10:54:20 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:40:12 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef struct	s_table
 	int				persons;
 	int				forks;
 	int				end;
-	sem_t			*game;
+	sem_t			*mtdie;
 	pthread_t		checker;
 	struct s_philo	*philos;
 }				t_table;
@@ -46,6 +46,7 @@ typedef struct	s_philo
 	sem_t			*done;
 	sem_t			*print;
 	sem_t			*sem;
+	sem_t			*mtphilo;
 	pthread_t		checker;
 	struct timeval	start_time;
 	struct s_philo	*next;
@@ -67,6 +68,7 @@ void			ft_del(void *data);
 int				ft_is_strdig(char *str);
 char			*ft_strjoin(char const *s1, char const *s2);
 size_t			ft_strlen(const char *str);
+void			ft_putnbr(long long d);
 void			print_status(t_philo *philo, int action);
 long			get_current_time(int micro, struct timeval start_time);
 int				ft_do_action(t_philo *philo);

@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:03:17 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:41:26 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ void	*ft_philo_checker(void *arg)
 	while (1)
 	{
 		sem_wait(philo->mtphilo);
-		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1) && get_current_time(1,
-			philo->start_time) > philo->start)
+		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1)
+			&& get_current_time(1, philo->start_time) > philo->start)
 		{
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
@@ -84,7 +84,8 @@ void	*ft_philo_life(void *arg)
 		{
 			me->done = 1;
 			break ;
-		} else if (me->die)
+		}
+		else if (me->die)
 			break ;
 	}
 	return (NULL);
@@ -92,13 +93,10 @@ void	*ft_philo_life(void *arg)
 
 void	create_lifes(t_table *table)
 {
-	int				i;
 	t_philo			*tmp;
 	pthread_t		checker;
 	struct timeval	current_time;
-	pthread_t		tids[table->persons];
 
-	i = 0;
 	tmp = table->philos;
 	pthread_create(&checker, NULL, &game_checker, (void *)table);
 	pthread_detach(checker);
@@ -110,7 +108,6 @@ void	create_lifes(t_table *table)
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
 		usleep(45);
 		tmp = tmp->next;
-		tids[i++] = tmp->thrd;
 		if (tmp->head)
 			break ;
 	}

@@ -6,12 +6,11 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 13:52:09 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:28:22 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
 
 void	*game_checker(void *arg)
 {
@@ -70,7 +69,6 @@ void	*ft_philo_life(void *arg)
 	pthread_t		checker;
 
 	me = (t_philo*)arg;
-	
 	me->start = get_current_time(1, me->start_time) + (me->die_time * 1000);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
 	me->checker = checker;
