@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:59 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 13:43:43 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:49:15 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,7 @@ void	finish_simulation(t_table *table, int death)
 	ft_del(table);
 	exit(0);
 }
+
 
 
 void	ft_get_fork(t_philo *philo)

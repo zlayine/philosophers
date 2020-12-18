@@ -2,6 +2,8 @@
 .DS_Store
 exam
 philosophers
-*.dSYM*
 .vscode
 !*.c
+philo*
+!philo*/
+*.dSYM*/
