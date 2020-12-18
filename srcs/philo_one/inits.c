@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:26:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:28:41 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:51:49 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_philo		*init_philo(int name, t_philo *prev, char **args)
 {
-	t_philo	*philo;
+	t_philo			*philo;
 
 	philo = malloc(sizeof(t_philo));
 	philo->die_time = ft_atoi(args[1]);
@@ -22,6 +22,8 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
+	philo->mtphilo = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(philo->mtphilo, NULL);
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;
@@ -38,13 +40,29 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	return (philo);
 }
 
-void		init_mutex(pthread_mutex_t *mutex, int t)
+void		init_mutex(pthread_mutex_t *mutex, int total)
 {
 	int		i;
 
 	i = -1;
-	while (++i < t)
+	while (++i < total)
 		pthread_mutex_init(&mutex[i], NULL);
+}
+
+t_table		*init_table(char **args)
+{
+	t_table	*table;
+	int		i;
+
+	i = 0;
+	table = malloc(sizeof(t_table));
+	table->persons = atoi(args[0]);
+	table->forks = atoi(args[0]);
+	table->end = 0;
+	table->philos = create_philos(table->persons, table, args);
+	table->mtdie = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(table->mtdie, NULL);
+	return (table);
 }
 
 t_philo		*create_philos(int total, t_table *table, char **args)
@@ -74,18 +92,4 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	tmp->next = head;
 	head->head = 1;
 	return (head);
-}
-
-t_table		*init_table(char **args)
-{
-	t_table	*table;
-	int		i;
-
-	i = 0;
-	table = malloc(sizeof(t_table));
-	table->persons = atoi(args[0]);
-	table->forks = atoi(args[0]);
-	table->end = 0;
-	table->philos = create_philos(table->persons, table, args);
-	return (table);
 }

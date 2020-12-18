@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:28:00 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 14:03:47 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 t_philo		*init_philo(int name, t_philo *prev, char **args)
 {
 	t_philo	*philo;
+	char	*tmp;
 
 	philo = malloc(sizeof(t_philo));
 	philo->die_time = ft_atoi(args[1]);
@@ -22,6 +23,9 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
+	tmp = ft_strjoin("sem_ph_", ft_itoa(name));
+	philo->mtphilo = init_semaphore(1, tmp);
+	ft_del(tmp);
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;
@@ -72,6 +76,7 @@ t_table		*init_table(char **args)
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
 	table->end = 0;
+	table->mtdie = init_semaphore(1, "sem_game");
 	table->philos = create_philos(table->persons, table, args);
 	return (table);
 }

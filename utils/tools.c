@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:14:27 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 10:55:11 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:53:54 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ int		valid_args(int total, char **args)
 		ft_putstr("Error: value of an arguments must be numbers only\n");
 		return (0);
 	}
-	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 ||
-		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || (total == 6 &&
+	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 60 ||
+		ft_atoi(args[2]) <= 60 || ft_atoi(args[3]) <= 60 || (total == 6 &&
 			ft_atoi(args[4]) <= 0))
 	{
 		ft_putstr("Error: value of an argument is out of range\n");

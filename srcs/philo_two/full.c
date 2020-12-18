@@ -23,15 +23,13 @@ void	print_status(t_philo *philo, int action)
 	sem_wait(philo->print);
 	if (philo->die == 2)
 		exit (0);
-	// printf("%d %d\n", philo->name, philo->die);
-	tmp = ft_itoa(get_current_time(0, philo->start_time));
-	ft_putstr(tmp);
-	ft_del(tmp);
+	ft_putnbr(get_current_time(0, philo->start_time));
 	ft_putchar(' ');
-	tmp = ft_itoa(philo->name);
-	ft_putstr(tmp);
-	ft_del(tmp);
-	ft_putchar(' ');
+	if (action != 6)
+	{
+		ft_putnbr(philo->name);
+		ft_putchar(' ');
+	}
 	ft_putstr(get_action(action));
 	action != 5 ? sem_post(philo->print) : 0;
 }
@@ -55,14 +53,13 @@ void	free_simulation(t_philo *curr)
 		sem_post(curr->mtphilo);
 		sem_close(curr->mtphilo);
 		sem_unlink(name_tmp);
-		
+		pthread_detach(curr->checker);
 		ft_del(name_tmp);
 		tmp = curr->next;
 		ft_del(curr);
 		curr = NULL;
 		curr = tmp;
 	}
-	// sem_post(print);
 	i = -1;
 	while (++i < 3)
 		sem_post(print);
@@ -169,8 +166,8 @@ sem_t		*init_semaphore(int total, char *name)
 void	ft_get_fork(t_philo *philo)
 {
 	sem_wait(philo->sem);
-	print_status(philo, FORK_ACTION);
 	sem_wait(philo->sem);
+	print_status(philo, FORK_ACTION);
 	print_status(philo, FORK_ACTION);
 }
 
@@ -182,13 +179,13 @@ void	ft_drop_fork(t_philo *philo)
 
 void	ft_eat(t_philo *philo)
 {
+	philo->start = get_current_time(1, philo->start_time) + (philo->die_time * 1000);
 	sem_wait(philo->mtphilo);
-	philo->start = get_current_time(1, philo->start_time);
 	print_status(philo, EAT_ACTION);
 	usleep(philo->eat_time * 1000);
+	sem_post(philo->mtphilo);
 	if (philo->eat_num != -1)
 		philo->eat_num--;
-	sem_post(philo->mtphilo);
 }
 
 void	ft_sleep(t_philo *philo)
@@ -237,7 +234,7 @@ void	*ft_philo_checker(void *arg)
 	{
 		sem_wait(philo->mtphilo);
 		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1) && get_current_time(1,
-			philo->start_time) > philo->start + (philo->die_time * 1000))
+			philo->start_time) > philo->start)
 		{
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
@@ -246,6 +243,7 @@ void	*ft_philo_checker(void *arg)
 			break ;
 		}
 		sem_post(philo->mtphilo);
+		usleep(5);
 	}
 	return (NULL);
 }
@@ -256,9 +254,9 @@ void	*ft_philo_life(void *arg)
 	pthread_t	checker;
 
 	me = (t_philo*)arg;
-	me->start = get_current_time(1, me->start_time);
+	me->start = get_current_time(1, me->start_time) + (me->die_time * 1000);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	pthread_detach(checker);
+	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
@@ -285,20 +283,19 @@ void	create_lifes(t_table *table)
 
 	i = 0;
 	tmp = table->philos;
-	gettimeofday(&current_time, NULL);
 	pthread_create(&checker, NULL, &game_checker, (void *)table);
 	pthread_detach(checker);
 	sem_wait(table->mtdie);
+	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
-		pthread_detach(tmp->thrd);
+		usleep(45);
 		tmp = tmp->next;
 		tids[i++] = tmp->thrd;
 		if (tmp->head)
 			break ;
-		// usleep(60);
 	}
 	sem_wait(table->mtdie);
 	sem_post(table->mtdie);

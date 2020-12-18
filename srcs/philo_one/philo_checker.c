@@ -6,11 +6,12 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:45:00 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:52:09 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
 
 void	*game_checker(void *arg)
 {
@@ -21,45 +22,44 @@ void	*game_checker(void *arg)
 	table = (t_table*)arg;
 	philo = table->philos;
 	done = 0;
-	while (!table->end)
+	while (1)
 	{
 		if (philo && philo->eat_num == 0 && philo->done && philo->die != -1)
 		{
 			done++;
 			philo->die = -1;
 		}
-		else if (table->end)
+		if (done == table->persons || !philo)
 			break ;
 		philo = philo->next;
-		if (done == table->persons)
-			break ;
 	}
-	finish_simulation(philo->table, table->end != 0);
+	if (!philo)
+		return (NULL);
+	print_status(philo, SIM_OVER);
+	table->end = 1;
+	pthread_mutex_unlock(table->mtdie);
 	return (NULL);
 }
 
 void	*ft_philo_checker(void *arg)
 {
 	t_philo *philo;
-	int		done;
 
 	philo = (t_philo*)arg;
-	done = 0;
-	while (philo && philo->table)
+	while (1)
 	{
-		if (!philo || philo->die)
-			break ;
-		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1,
-			philo->start_time) > philo->start + (philo->die_time * 1000))
+		pthread_mutex_lock(philo->mtphilo);
+		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1) &&
+			get_current_time(1, philo->start_time) > philo->start)
 		{
 			philo->die = 1;
-			pthread_mutex_lock(philo->print);
-			philo->table->end = !philo->table->end ?
-				philo->name : philo->table->end;
 			print_status(philo, DIE_ACTION);
-			pthread_mutex_unlock(philo->print);
+			pthread_mutex_unlock(philo->mtphilo);
+			pthread_mutex_unlock(philo->table->mtdie);
 			break ;
 		}
+		pthread_mutex_unlock(philo->mtphilo);
+		usleep(5);
 	}
 	return (NULL);
 }
@@ -70,13 +70,16 @@ void	*ft_philo_life(void *arg)
 	pthread_t		checker;
 
 	me = (t_philo*)arg;
-	me->start = get_current_time(1, me->start_time);
+	
+	me->start = get_current_time(1, me->start_time) + (me->die_time * 1000);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
 	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
 		ft_eat(me);
+		ft_drop_fork(me);
+		ft_sleep(me);
 		if (me->eat_num == 0)
 		{
 			me->done = 1;
@@ -89,19 +92,23 @@ void	*ft_philo_life(void *arg)
 void	create_lifes(t_table *table)
 {
 	t_philo			*tmp;
-	struct timeval	current_time;
 	pthread_t		checker;
+	struct timeval	current_time;
 
 	tmp = table->philos;
-	gettimeofday(&current_time, NULL);
 	pthread_create(&checker, NULL, &game_checker, (void *)table);
+	pthread_detach(checker);
+	pthread_mutex_lock(table->mtdie);
+	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
+		usleep(45);
 		tmp = tmp->next;
 		if (tmp->head)
 			break ;
 	}
-	pthread_join(checker, NULL);
+	pthread_mutex_lock(table->mtdie);
+	pthread_mutex_unlock(table->mtdie);
 }
