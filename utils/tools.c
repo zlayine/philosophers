@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:14:27 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 17:14:28 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 10:55:11 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,3 @@ long	get_current_time(int micro, struct timeval start_time)
 	else
 		return (time);
 }
-

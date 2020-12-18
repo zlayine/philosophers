@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
+/*   full.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:59 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 20:44:13 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:43:43 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
 
 char	*get_action(int action)
 {
@@ -34,55 +33,54 @@ void	print_status(t_philo *philo, int action)
 	char	*tmp;
 
 	pthread_mutex_lock(philo->print);
-	tmp = ft_itoa(get_current_time(0, philo->start_time));
-	ft_putstr(tmp);
-	ft_del(tmp);
-	ft_putchar(' ');
-	tmp = ft_itoa(philo->name);
-	ft_putstr(tmp);
-	ft_del(tmp);
-	ft_putchar(' ');
+	ft_putnbr(get_current_time(0, philo->start_time));
+	ft_putchar('\t');
+	if (action != 6)
+	{
+		ft_putnbr(philo->name);
+		ft_putchar(' ');
+	}
 	ft_putstr(get_action(action));
-	pthread_mutex_unlock(philo->print);
+	action != 5 ? pthread_mutex_unlock(philo->print) : 0;
 }
 
-long	get_current_time(int micro, struct timeval start_time)
-{
-	struct timeval	current_time;
-	int				time;
+// long	get_current_time(int micro, struct timeval start_time)
+// {
+// 	struct timeval	current_time;
+// 	int				time;
 
-	gettimeofday(&current_time, NULL);
-	time = ((current_time.tv_sec - start_time.tv_sec)
-		* 1000000L + current_time.tv_usec) - start_time.tv_usec;
-	if (!micro)
-		return (time / 1000);
-	else
-		return (time);
-}
+// 	gettimeofday(&current_time, NULL);
+// 	time = ((current_time.tv_sec - start_time.tv_sec)
+// 		* 1000000L + current_time.tv_usec) - start_time.tv_usec;
+// 	if (!micro)
+// 		return (time / 1000);
+// 	else
+// 		return (time);
+// }
 
-int		valid_args(int total, char **args)
-{
-	if (total < 5 || total > 6)
-	{
-		ft_putstr("Error: please specify the required arguments\n");
-		return (0);
-	}
-	if (!ft_is_strdig(args[0]) || !ft_is_strdig(args[1]) ||
-		!ft_is_strdig(args[2]) || !ft_is_strdig(args[3]) ||
-		(total == 6 && !ft_is_strdig(args[4])))
-	{
-		ft_putstr("Error: value of an arguments must be numbers only\n");
-		return (0);
-	}
-	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 ||
-		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || (total == 6 &&
-			ft_atoi(args[4]) <= 0))
-	{
-		ft_putstr("Error: value of an argument is out of range\n");
-		return (0);
-	}
-	return (1);
-}
+// int		valid_args(int total, char **args)
+// {
+// 	if (total < 5 || total > 6)
+// 	{
+// 		ft_putstr("Error: please specify the required arguments\n");
+// 		return (0);
+// 	}
+// 	if (!ft_is_strdig(args[0]) || !ft_is_strdig(args[1]) ||
+// 		!ft_is_strdig(args[2]) || !ft_is_strdig(args[3]) ||
+// 		(total == 6 && !ft_is_strdig(args[4])))
+// 	{
+// 		ft_putstr("Error: value of an arguments must be numbers only\n");
+// 		return (0);
+// 	}
+// 	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 0 ||
+// 		ft_atoi(args[2]) <= 0 || ft_atoi(args[3]) <= 0 || (total == 6 &&
+// 			ft_atoi(args[4]) <= 0))
+// 	{
+// 		ft_putstr("Error: value of an argument is out of range\n");
+// 		return (0);
+// 	}
+// 	return (1);
+// }
 
 void	free_simulation(t_philo *curr, int total)
 {
@@ -95,20 +93,22 @@ void	free_simulation(t_philo *curr, int total)
 	mutex = curr->mutex;
 	print = curr->print;
 	curr->prev->next = NULL;
+	pthread_mutex_destroy(print);
+	while (++i < total)
+		pthread_mutex_destroy(&mutex[i]);
 	while (curr)
 	{
-		pthread_mutex_destroy(curr->mtphilo);
+		pthread_mutex_unlock(curr->mtphilo);
+		pthread_mutex_lock(curr->mtphilo);
 		curr->die = 1;
-		// pthread_detach(curr->thrd);
-		// pthread_detach(curr->checker);
+		pthread_mutex_unlock(curr->mtphilo);
+		pthread_mutex_destroy(curr->mtphilo);
+		pthread_detach(curr->thrd);
+		pthread_detach(curr->checker);
 		tmp = curr->next;
 		ft_del(curr);
 		curr = tmp;
 	}
-	// while (++i < total)
-	// 	pthread_mutex_destroy(&mutex[i]);
-	// pthread_mutex_destroy(print);
-	pthread_mutex_destroy(print);
 }
 
 void	finish_simulation(t_table *table, int death)
@@ -126,9 +126,9 @@ void	finish_simulation(t_table *table, int death)
 
 void	ft_get_fork(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->mutex[philo->l_fork]);
 	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
 	print_status(philo, FORK_ACTION);
-	pthread_mutex_lock(&philo->mutex[philo->l_fork]);
 	print_status(philo, FORK_ACTION);
 }
 
@@ -140,13 +140,13 @@ void	ft_drop_fork(t_philo *philo)
 
 void	ft_eat(t_philo *philo)
 {
+	philo->start = get_current_time(1, philo->start_time) + (philo->die_time * 1000);
 	pthread_mutex_lock(philo->mtphilo);
-	philo->start = get_current_time(1, philo->start_time);
 	print_status(philo, EAT_ACTION);
 	usleep(philo->eat_time * 1000);
+	pthread_mutex_unlock(philo->mtphilo);
 	if (philo->eat_num != -1)
 		philo->eat_num--;
-	pthread_mutex_unlock(philo->mtphilo);
 }
 
 void	ft_sleep(t_philo *philo)
@@ -254,10 +254,12 @@ void	*game_checker(void *arg)
 			done++;
 			philo->die = -1;
 		}
-		philo = philo->next;
-		if (done == table->persons)
+		if (done == table->persons || !philo)
 			break ;
+		philo = philo->next;
 	}
+	if (!philo)
+		return (NULL);
 	print_status(philo, SIM_OVER);
 	table->end = 1;
 	pthread_mutex_unlock(table->mtdie);
@@ -267,23 +269,22 @@ void	*game_checker(void *arg)
 void	*ft_philo_checker(void *arg)
 {
 	t_philo *philo;
-	int		done;
 
 	philo = (t_philo*)arg;
-	done = 0;
 	while (1)
 	{
-		// pthread_mutex_lock(philo->mtphilo);
-		if ((philo->eat_num || philo->eat_num == -1) && get_current_time(1,
-			philo->start_time) > philo->start + (philo->die_time * 1000))
+		pthread_mutex_lock(philo->mtphilo);
+		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1) &&
+			get_current_time(1, philo->start_time) > philo->start)
 		{
 			philo->die = 1;
-			pthread_mutex_lock(philo->print);
 			print_status(philo, DIE_ACTION);
+			pthread_mutex_unlock(philo->mtphilo);
 			pthread_mutex_unlock(philo->table->mtdie);
 			break ;
 		}
-		// pthread_mutex_unlock(philo->mtphilo);
+		pthread_mutex_unlock(philo->mtphilo);
+		usleep(5);
 	}
 	return (NULL);
 }
@@ -294,20 +295,21 @@ void	*ft_philo_life(void *arg)
 	pthread_t		checker;
 
 	me = (t_philo*)arg;
-	me->start = get_current_time(1, me->start_time);
+	
+	me->start = get_current_time(1, me->start_time) + (me->die_time * 1000);
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	pthread_detach(checker);
+	me->checker = checker;
 	while (1)
 	{
 		ft_get_fork(me);
 		ft_eat(me);
 		ft_drop_fork(me);
 		ft_sleep(me);
-		// if (me->eat_num == 0)
-		// {
-		// 	me->done = 1;
-		// 	break ;
-		// }
+		if (me->eat_num == 0)
+		{
+			me->done = 1;
+			break ;
+		}
 	}
 	return (NULL);
 }
@@ -315,26 +317,25 @@ void	*ft_philo_life(void *arg)
 void	create_lifes(t_table *table)
 {
 	t_philo			*tmp;
-	struct timeval	current_time;
 	pthread_t		checker;
+	struct timeval	current_time;
 
 	tmp = table->philos;
-	gettimeofday(&current_time, NULL);
-	// pthread_create(&checker, NULL, &game_checker, (void *)table);
-	// pthread_detach(checker);
+	pthread_create(&checker, NULL, &game_checker, (void *)table);
+	pthread_detach(checker);
 	pthread_mutex_lock(table->mtdie);
+	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
 		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
-		pthread_detach(tmp->thrd);
-		usleep(60);
+		usleep(45);
 		tmp = tmp->next;
 		if (tmp->head)
 			break ;
 	}
 	pthread_mutex_lock(table->mtdie);
-	// pthread_mutex_unlock(table->mtdie);
+	pthread_mutex_unlock(table->mtdie);
 }
 
 int		main(int argc, char **argv)

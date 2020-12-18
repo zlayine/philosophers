@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:58:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 18:44:28 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 13:22:06 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ typedef struct	s_table
 	int				persons;
 	int				forks;
 	int				end;
-	sem_t			*game;
-	pthread_t		checker;
+	sem_t			*mtdie;
 	struct s_philo	*philos;
 }				t_table;
 
@@ -46,8 +45,9 @@ typedef struct	s_philo
 	int				done;
 	sem_t			*print;
 	sem_t			*sem;
+	sem_t			*mtphilo;
 	pthread_t		thrd;
-	pthread_t		checker;
+	// pthread_t		checker;
 	struct timeval	start_time;
 	struct s_philo	*next;
 	struct s_philo	*prev;
@@ -59,6 +59,7 @@ typedef struct	s_philo
 # define SLEEP_ACTION 3
 # define THINK_ACTION 4
 # define DIE_ACTION 5
+# define SIM_OVER 6
 
 int				ft_atoi(const char *str);
 void			ft_putstr(char *s);
@@ -66,6 +67,8 @@ char			*ft_itoa(long n);
 void			ft_putchar(char c);
 void			ft_del(void *data);
 int				ft_is_strdig(char *str);
+char			*ft_strjoin(char const *s1, char const *s2);
+size_t			ft_strlen(const char *str);
 void			print_status(t_philo *philo, int action);
 long			get_current_time(int micro, struct timeval start_time);
 int				ft_do_action(t_philo *philo);
@@ -83,5 +86,6 @@ void			ft_drop_fork(t_philo *philo);
 void			ft_get_fork(t_philo *philo);
 sem_t			*init_semaphore(int total, char *name);
 void			*game_checker(void *arg);
+int				valid_args(int total, char **args);
 
 #endif

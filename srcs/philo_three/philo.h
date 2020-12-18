@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/16 09:37:32 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 10:54:20 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ char			*ft_itoa(long n);
 void			ft_putchar(char c);
 void			ft_del(void *data);
 int				ft_is_strdig(char *str);
+char			*ft_strjoin(char const *s1, char const *s2);
+size_t			ft_strlen(const char *str);
 void			print_status(t_philo *philo, int action);
 long			get_current_time(int micro, struct timeval start_time);
 int				ft_do_action(t_philo *philo);

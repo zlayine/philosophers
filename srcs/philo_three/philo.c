@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:39:14 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/16 09:37:55 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/18 10:56:59 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,19 +39,19 @@ void	print_status(t_philo *philo, int action)
 	action != DIE_ACTION ? sem_post(philo->print) : 0;
 }
 
-long	get_current_time(int micro, struct timeval start_time)
-{
-	struct timeval	current_time;
-	int				time;
+// long	get_current_time(int micro, struct timeval start_time)
+// {
+// 	struct timeval	current_time;
+// 	int				time;
 
-	gettimeofday(&current_time, NULL);
-	time = ((current_time.tv_sec - start_time.tv_sec) * 1000000L
-		+ current_time.tv_usec) - start_time.tv_usec;
-	if (!micro)
-		return (time / 1000);
-	else
-		return (time);
-}
+// 	gettimeofday(&current_time, NULL);
+// 	time = ((current_time.tv_sec - start_time.tv_sec) * 1000000L
+// 		+ current_time.tv_usec) - start_time.tv_usec;
+// 	if (!micro)
+// 		return (time / 1000);
+// 	else
+// 		return (time);
+// }
 
 void	life_creation_end(t_table *table, pid_t *pids)
 {
