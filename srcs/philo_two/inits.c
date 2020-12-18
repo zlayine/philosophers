@@ -76,6 +76,7 @@ t_table		*init_table(char **args)
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
 	table->end = 0;
+	table->start = get_time();
 	table->mtdie = init_semaphore(1, "sem_game");
 	table->philos = create_philos(table->persons, table, args);
 	return (table);

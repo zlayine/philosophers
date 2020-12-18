@@ -33,7 +33,7 @@ void	print_status(t_philo *philo, int action)
 	char	*tmp;
 
 	pthread_mutex_lock(philo->print);
-	ft_putnbr(get_current_time(0, philo->start_time));
+	ft_putnbr(get_time() - philo->table->start);
 	ft_putchar('\t');
 	if (action != 6)
 	{

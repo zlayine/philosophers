@@ -51,15 +51,14 @@ void		init_mutex(pthread_mutex_t *mutex, int total)
 
 t_table		*init_table(char **args)
 {
-	t_table	*table;
-	int		i;
+	t_table			*table;
 
-	i = 0;
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
-	table->end = 0;
 	table->philos = create_philos(table->persons, table, args);
+	table->start = get_time();
+	table->end = 0;
 	table->mtdie = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(table->mtdie, NULL);
 	return (table);

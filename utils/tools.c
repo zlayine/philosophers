@@ -26,7 +26,7 @@ int		valid_args(int total, char **args)
 		ft_putstr("Error: value of an arguments must be numbers only\n");
 		return (0);
 	}
-	if (ft_atoi(args[0]) <= 0 || ft_atoi(args[1]) <= 60 ||
+	if (ft_atoi(args[0]) <= 1 || ft_atoi(args[1]) <= 60 ||
 		ft_atoi(args[2]) <= 60 || ft_atoi(args[3]) <= 60 || (total == 6 &&
 			ft_atoi(args[4]) <= 0))
 	{
@@ -48,4 +48,11 @@ long	get_current_time(int micro, struct timeval start_time)
 		return (time / 1000);
 	else
 		return (time);
+}
+
+long	get_time()
+{
+	struct timeval	time;
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }

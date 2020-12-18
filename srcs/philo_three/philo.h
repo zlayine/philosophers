@@ -59,6 +59,7 @@ typedef struct	s_philo
 # define SLEEP_ACTION 3
 # define THINK_ACTION 4
 # define DIE_ACTION 5
+# define SIM_OVER 6
 
 int				ft_atoi(const char *str);
 void			ft_putstr(char *s);
@@ -86,7 +87,7 @@ void			ft_drop_fork(t_philo *philo);
 void			ft_get_fork(t_philo *philo);
 sem_t			*init_semaphore(int total, char *name);
 void			*game_checker(void *arg);
-void			free_simulation(t_philo *curr, int death);
+void			free_simulation(t_philo *curr);
 void			life_creation_end(t_table *table, pid_t *pids);
 t_table			*init_table(char **args);
 void			create_lifes(t_table *table);

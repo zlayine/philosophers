@@ -28,5 +28,6 @@ size_t		ft_strlen(const char *str);
 int			valid_args(int total, char **args);
 long		get_current_time(int micro, struct timeval start_time);
 void		ft_putnbr(long long d);
+long		get_time();
 
 #endif

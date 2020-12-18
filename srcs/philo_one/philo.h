@@ -24,8 +24,9 @@ typedef struct	s_table
 {
 	int				persons;
 	int				forks;
-	int				end;
 	struct s_philo	*philos;
+	int				end;
+	long			start;
 	pthread_mutex_t	*mtdie;
 }				t_table;
 
@@ -39,10 +40,8 @@ typedef struct	s_philo
 	int				head;
 	int				done;
 	long			start;
-	struct timeval	start_time;
+	long			death_time;
 	int				die;
-	pthread_t		thrd;
-	pthread_t		checker;
 	struct s_table	*table;
 	struct s_philo	*next;
 	struct s_philo	*prev;
@@ -70,21 +69,17 @@ char			*ft_strjoin(char const *s1, char const *s2);
 size_t			ft_strlen(const char *str);
 void			ft_putnbr(long long d);
 void			print_status(t_philo *philo, int action);
-long			get_current_time(int micro, struct timeval start_time);
-int				ft_do_action(t_philo *philo);
-int				ft_action(t_philo *philo);
-void			check_life(t_philo *philo);
 void			*ft_philo_life(void *arg);
 t_philo			*init_philo(int name, t_philo *prev, char **args);
 t_philo			*create_philos(int total, t_table *table, char **args);
 t_table			*init_table(char **args);
 void			create_lifes(t_table *table);
 void			finish_simulation(t_table *table, int death);
-void			ft_sleep(t_philo *philo);
 void			ft_eat(t_philo *philo);
-void			ft_drop_fork(t_philo *philo);
 void			ft_get_fork(t_philo *philo);
+void			ft_finish_eat(t_philo *philo);
 void			init_mutex(pthread_mutex_t *mutex, int t);
 int				valid_args(int total, char **args);
+long			get_time();
 
 #endif

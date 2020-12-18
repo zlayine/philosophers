@@ -33,8 +33,8 @@ void	free_simulation(t_philo *curr, int total)
 		curr->die = 1;
 		pthread_mutex_unlock(curr->mtphilo);
 		pthread_mutex_destroy(curr->mtphilo);
-		pthread_detach(curr->thrd);
-		pthread_detach(curr->checker);
+		// pthread_detach(curr->thrd);
+		// pthread_detach(curr->checker);
 		tmp = curr->next;
 		ft_del(curr);
 		curr = tmp;

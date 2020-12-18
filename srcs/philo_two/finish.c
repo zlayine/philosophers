@@ -26,7 +26,7 @@ void	free_simulation(t_philo *curr)
 		sem_post(curr->mtphilo);
 		sem_close(curr->mtphilo);
 		sem_unlink(name_tmp);
-		pthread_detach(curr->checker);
+		// pthread_detach(curr->checker);
 		ft_del(name_tmp);
 		tmp = curr->next;
 		ft_del(curr);

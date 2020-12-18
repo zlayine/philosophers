@@ -51,7 +51,7 @@ void	*ft_philo_checker(void *arg)
 	{
 		sem_wait(philo->mtphilo);
 		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1)
-			&& get_current_time(1, philo->start_time) > philo->start)
+			&& get_time() > philo->death_time)
 		{
 			philo->die = 1;
 			print_status(philo, DIE_ACTION);
@@ -71,22 +71,22 @@ void	*ft_philo_life(void *arg)
 	pthread_t	checker;
 
 	me = (t_philo*)arg;
-	me->start = get_current_time(1, me->start_time) + (me->die_time * 1000);
+	me->start = get_time();
+	me->death_time = me->start + me->die_time;
 	pthread_create(&checker, NULL, &ft_philo_checker, (void *)me);
-	me->checker = checker;
+	pthread_detach(checker);
 	while (1)
 	{
 		ft_get_fork(me);
 		ft_eat(me);
-		ft_drop_fork(me);
-		ft_sleep(me);
-		if (me->eat_num == 0)
-		{
-			me->done = 1;
-			break ;
-		}
-		else if (me->die)
-			break ;
+		ft_finish_eat(me);
+		// if (me->eat_num == 0)
+		// {
+		// 	me->done = 1;
+		// 	break ;
+		// }
+		// else if (me->die)
+		// 	break ;
 	}
 	return (NULL);
 }
@@ -94,19 +94,23 @@ void	*ft_philo_life(void *arg)
 void	create_lifes(t_table *table)
 {
 	t_philo			*tmp;
-	pthread_t		checker;
+	pthread_t		thrd;
 	struct timeval	current_time;
 
 	tmp = table->philos;
-	pthread_create(&checker, NULL, &game_checker, (void *)table);
-	pthread_detach(checker);
+	if (tmp->eat_time != -1)
+	{
+		pthread_create(&thrd, NULL, &game_checker, (void *)table);
+		pthread_detach(thrd);
+	}
 	sem_wait(table->mtdie);
 	gettimeofday(&current_time, NULL);
 	while (tmp)
 	{
 		tmp->start_time = current_time;
-		pthread_create(&tmp->thrd, NULL, &ft_philo_life, (void *)tmp);
-		usleep(45);
+		pthread_create(&thrd, NULL, &ft_philo_life, (void *)tmp);
+		pthread_detach(thrd);
+		// usleep(50);
 		tmp = tmp->next;
 		if (tmp->head)
 			break ;

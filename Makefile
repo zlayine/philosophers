@@ -38,7 +38,7 @@ PHILO_ONE_HEAD = srcs/philo_one/philo.h
 PHILO_TWO_MAIN = srcs/philo_two/philo.c
 PHILO_TWO_HEAD = srcs/philo_two/philo.h
 
-PHILO_THREE_MAIN = srcs/philo_three/philo.c
+PHILO_THREE_MAIN = srcs/philo_three/full.c
 PHILO_THREE_HEAD = srcs/philo_three/philo.h
 
 all: $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
@@ -53,7 +53,8 @@ $(PHILO_TWO): $(OBJ) $(SRCS_TWO) $(PHILO_TWO_MAIN) $(PHILO_TWO_HEAD)
 
 
 $(PHILO_THREE): $(OBJ) $(SRCS_THREE) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
-	@gcc $(PHILO_THREE_MAIN) $(SRCS_THREE) $(OBJ) -o $(PHILO_THREE)
+	# @gcc $(PHILO_THREE_MAIN) $(SRCS_THREE) $(OBJ) -o $(PHILO_THREE)
+	@gcc $(PHILO_THREE_MAIN) $(OBJ) -o $(PHILO_THREE)
 	@echo "PHILO THREE SUCCESS!"
 
 %.o: %.c

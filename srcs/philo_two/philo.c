@@ -35,8 +35,8 @@ void	print_status(t_philo *philo, int action)
 	sem_wait(philo->print);
 	if (philo->die == 2)
 		exit(0);
-	ft_putnbr(get_current_time(0, philo->start_time));
-	ft_putchar(' ');
+	ft_putnbr(get_time() - philo->table->start);
+	ft_putchar('\t');
 	if (action != 6)
 	{
 		ft_putnbr(philo->name);
