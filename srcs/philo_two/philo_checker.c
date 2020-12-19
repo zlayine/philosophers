@@ -49,7 +49,8 @@ void	*ft_philo_checker(void *arg)
 	die = philo->table->mtdie;
 	while (1)
 	{
-		sem_wait(philo->mtphilo);
+		if (sem_wait(philo->mtphilo) < 0)
+			break ;
 		if (philo->die == 0 && philo->eat_num != 0
 			&& get_time() > philo->death_time)
 		{
@@ -60,7 +61,7 @@ void	*ft_philo_checker(void *arg)
 			break ;
 		}
 		sem_post(philo->mtphilo);
-		usleep(5);
+		usleep(1000);
 	}
 	return (NULL);
 }
@@ -80,13 +81,13 @@ void	*ft_philo_life(void *arg)
 		ft_get_fork(me);
 		ft_eat(me);
 		ft_finish_eat(me);
-		// if (me->eat_num == 0)
-		// {
-		// 	me->done = 1;
-		// 	break ;
-		// }
-		// else if (me->die)
-		// 	break ;
+		if (me->eat_num == 0)
+		{
+			me->done = 1;
+			break ;
+		}
+		if (me->die)
+			break ;
 	}
 	return (NULL);
 }

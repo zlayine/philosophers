@@ -49,8 +49,6 @@ void	finish_simulation(t_table *table, int death)
 	sem_close(curr->sem);
 	sem_unlink("table_sem");
 	free_simulation(curr);
-	while (++i < table->persons)
-		sem_post(print);
 	sem_close(print);
 	sem_unlink("print_sem");
 	sem_close(table->mtdie);

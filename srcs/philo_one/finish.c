@@ -28,10 +28,7 @@ void	free_simulation(t_philo *curr, int total)
 		pthread_mutex_destroy(&mutex[i]);
 	while (curr)
 	{
-		pthread_mutex_unlock(curr->mtphilo);
-		pthread_mutex_lock(curr->mtphilo);
 		curr->die = 1;
-		pthread_mutex_unlock(curr->mtphilo);
 		pthread_mutex_destroy(curr->mtphilo);
 		tmp = curr->next;
 		ft_del(curr);
