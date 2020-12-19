@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:50 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:28:03 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 18:29:38 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ void	ft_get_fork(t_philo *philo)
 	print_status(philo, FORK_ACTION);
 	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
 	print_status(philo, FORK_ACTION);
-	philo->die = -2;
 }
 
 void	ft_eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->mtphilo);
+	philo->die = -2;
 	philo->start = get_time();
 	philo->death_time = philo->start + philo->die_time;
 	print_status(philo, EAT_ACTION);
