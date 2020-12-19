@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:39:28 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 19:50:28 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,19 @@ void	free_simulation(t_philo *curr)
 {
 	t_philo	*tmp;
 	char	*name_tmp;
+	char	*strname;
 
 	while (curr)
 	{
-		name_tmp = ft_strjoin("sem_ph_", ft_itoa(curr->name));
+		strname = ft_itoa(curr->name);
+		name_tmp = ft_strjoin("sem_ph_", strname);
 		sem_post(curr->mtphilo);
 		sem_wait(curr->mtphilo);
 		curr->die = 2;
 		sem_post(curr->mtphilo);
 		sem_close(curr->mtphilo);
 		sem_unlink(name_tmp);
+		ft_del(strname);
 		ft_del(name_tmp);
 		tmp = curr->next;
 		ft_del(curr);

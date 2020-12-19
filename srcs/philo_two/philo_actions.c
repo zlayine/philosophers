@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:29:08 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 19:57:13 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	ft_get_fork(t_philo *philo)
 
 void	ft_eat(t_philo *philo)
 {
-	sem_wait(philo->mtphilo);
+	if (!philo || sem_wait(philo->mtphilo) < 0 )
+		exit(1);
 	philo->die = -2;
 	philo->start = get_time();
 	philo->death_time = philo->start + philo->die_time;
@@ -31,7 +32,8 @@ void	ft_eat(t_philo *philo)
 	if (philo->eat_num != -1)
 		philo->eat_num--;
 	philo->die = 0;
-	sem_post(philo->mtphilo);
+	if (!philo || sem_post(philo->mtphilo) < 0)
+		exit(1);
 }
 
 void	ft_finish_eat(t_philo *philo)

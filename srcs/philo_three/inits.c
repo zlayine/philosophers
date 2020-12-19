@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:38:33 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/15 16:49:22 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 20:02:27 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,19 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 {
 	t_philo	*philo;
 	char	*tmp;
-
+	char	*strname;
+	
 	philo = malloc(sizeof(t_philo));
 	philo->die_time = ft_atoi(args[1]);
 	philo->eat_time = ft_atoi(args[2]);
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
-	tmp = ft_strjoin("sem_ph_", ft_itoa(name));
+	strname = ft_itoa(name);
+	tmp = ft_strjoin("sem_ph_", strname);
 	philo->mtphilo = init_semaphore(1, tmp);
 	ft_del(tmp);
+	ft_del(strname);
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;

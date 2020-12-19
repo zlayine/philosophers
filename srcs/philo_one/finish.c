@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 16:45:42 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 19:31:34 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,15 @@ void	free_simulation(t_philo *curr, int total)
 	print = curr->print;
 	curr->prev->next = NULL;
 	pthread_mutex_destroy(print);
+	ft_del(print);
 	while (++i < total)
 		pthread_mutex_destroy(&mutex[i]);
+	ft_del(mutex);
 	while (curr)
 	{
 		curr->die = 1;
 		pthread_mutex_destroy(curr->mtphilo);
+		ft_del(curr->mtphilo);
 		tmp = curr->next;
 		ft_del(curr);
 		curr = tmp;

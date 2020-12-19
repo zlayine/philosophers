@@ -6,13 +6,13 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:26:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 13:51:49 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 19:30:15 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-t_philo		*init_philo(int name, t_philo *prev, char **args)
+t_philo		*init_philo(int name, t_philo *prev, char **args, int argc)
 {
 	t_philo			*philo;
 
@@ -20,7 +20,7 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->die_time = ft_atoi(args[1]);
 	philo->eat_time = ft_atoi(args[2]);
 	philo->sleep_time = ft_atoi(args[3]);
-	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
+	philo->eat_num = argc == 5 ? ft_atoi(args[4]) : -1;
 	philo->name = name;
 	philo->mtphilo = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(philo->mtphilo, NULL);
@@ -34,6 +34,7 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->l_fork = 0;
 	if (prev)
 	{
+		
 		philo->l_fork = prev->r_fork;
 		prev->next = philo;
 	}
@@ -49,14 +50,14 @@ void		init_mutex(pthread_mutex_t *mutex, int total)
 		pthread_mutex_init(&mutex[i], NULL);
 }
 
-t_table		*init_table(char **args)
+t_table		*init_table(int argc, char **args)
 {
 	t_table			*table;
 
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
-	table->philos = create_philos(table->persons, table, args);
+	table->philos = create_philos(table->persons, table, args, argc);
 	table->start = get_time();
 	table->end = 0;
 	table->mtdie = malloc(sizeof(pthread_mutex_t));
@@ -64,7 +65,7 @@ t_table		*init_table(char **args)
 	return (table);
 }
 
-t_philo		*create_philos(int total, t_table *table, char **args)
+t_philo		*create_philos(int total, t_table *table, char **args, int argc)
 {
 	t_philo			*head;
 	t_philo			*tmp;
@@ -74,13 +75,14 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 
 	i = -1;
 	head = NULL;
+	tmp = NULL;
 	mutex = malloc(sizeof(pthread_mutex_t) * total);
 	print = malloc(sizeof(pthread_mutex_t));
 	init_mutex(mutex, total);
 	pthread_mutex_init(print, NULL);
 	while (++i < total)
 	{
-		tmp = init_philo(i + 1, tmp, args);
+		tmp = init_philo(i + 1, tmp, args, argc);
 		tmp->table = table;
 		tmp->mutex = mutex;
 		tmp->print = print;

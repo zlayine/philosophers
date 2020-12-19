@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:41:26 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 20:00:48 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,11 @@ void	*game_checker(void *arg)
 	t_table	*table;
 	t_philo *philo;
 	int		done;
+	int		total;
 
 	table = (t_table*)arg;
 	philo = table->philos;
+	total = table->persons;
 	done = 0;
 	while (1)
 	{
@@ -28,7 +30,7 @@ void	*game_checker(void *arg)
 			done++;
 			philo->die = -1;
 		}
-		if (done == table->persons || !philo)
+		if (done == total || !philo)
 			break ;
 		philo = philo->next;
 	}
@@ -47,11 +49,11 @@ void	*ft_philo_checker(void *arg)
 
 	philo = (t_philo*)arg;
 	die = philo->table->mtdie;
-	while (1)
+	while (philo && philo->die != -1)
 	{
-		if (sem_wait(philo->mtphilo) < 0)
+		if (!philo || sem_wait(philo->mtphilo) < 0)
 			break ;
-		if (philo->die == 0 && philo->eat_num != 0
+		if (philo && philo->die == 0 && philo->eat_num != 0
 			&& get_time() > philo->death_time)
 		{
 			philo->die = 1;
@@ -60,7 +62,8 @@ void	*ft_philo_checker(void *arg)
 			sem_post(die);
 			break ;
 		}
-		sem_post(philo->mtphilo);
+		if (!philo || sem_post(philo->mtphilo) < 0)
+			break ;
 		usleep(1000);
 	}
 	return (NULL);
