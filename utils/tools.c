@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:14:27 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 13:53:54 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 16:38:12 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,10 @@ long	get_current_time(int micro, struct timeval start_time)
 		return (time);
 }
 
-long	get_time()
+long	get_time(void)
 {
 	struct timeval	time;
+
 	gettimeofday(&time, NULL);
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }

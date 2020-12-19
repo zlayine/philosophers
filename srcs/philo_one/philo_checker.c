@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:28:22 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/19 16:47:23 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,12 @@ void	*game_checker(void *arg)
 
 void	*ft_philo_checker(void *arg)
 {
-	t_philo *philo;
+	t_philo			*philo;
 	pthread_mutex_t	*mtdie;
 
 	philo = (t_philo*)arg;
 	mtdie = philo->table->mtdie;
-	while (1)
+	while (philo->die == 0)
 	{
 		if (pthread_mutex_lock(philo->mtphilo) < 0)
 			break ;
