@@ -47,7 +47,8 @@ void	*ft_philo_checker(void *arg)
 	die = philo->table->mtdie;
 	while (1)
 	{
-		sem_wait(philo->mtphilo);
+		if (sem_wait(philo->mtphilo) < 0)
+			break ;
 		if (philo->die == 0 && philo->eat_num != 0
 			&& get_time() > philo->death_time)
 		{
