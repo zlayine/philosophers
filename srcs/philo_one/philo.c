@@ -32,7 +32,8 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	pthread_mutex_lock(philo->print);
+	if (pthread_mutex_lock(philo->print) < 0)
+		exit(1);
 	ft_putnbr(get_time() - philo->table->start);
 	ft_putchar('\t');
 	if (action != 6)

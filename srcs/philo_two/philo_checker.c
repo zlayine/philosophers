@@ -111,7 +111,6 @@ void	create_lifes(t_table *table)
 		tmp->start_time = current_time;
 		pthread_create(&thrd, NULL, &ft_philo_life, (void *)tmp);
 		pthread_detach(thrd);
-		// usleep(50);
 		tmp = tmp->next;
 		if (tmp->head)
 			break ;

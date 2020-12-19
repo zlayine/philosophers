@@ -49,7 +49,8 @@ void	*ft_philo_checker(void *arg)
 	mtdie = philo->table->mtdie;
 	while (1)
 	{
-		pthread_mutex_lock(philo->mtphilo);
+		if (pthread_mutex_lock(philo->mtphilo) < 0)
+			break ;
 		if (philo->die == 0 && philo->eat_num != 0 &&
 			get_time() > philo->death_time)
 		{
@@ -60,7 +61,7 @@ void	*ft_philo_checker(void *arg)
 			break ;
 		}
 		pthread_mutex_unlock(philo->mtphilo);
-		usleep(1000);
+		usleep(100);
 	}
 	return (NULL);
 }
@@ -105,7 +106,7 @@ void	create_lifes(t_table *table)
 	{
 		pthread_create(&thrd, NULL, &ft_philo_life, (void *)tmp);
 		pthread_detach(thrd);
-		usleep(50);
+		usleep(100);
 		tmp = tmp->next;
 		if (tmp->head)
 			break ;

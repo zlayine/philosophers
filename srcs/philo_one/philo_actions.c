@@ -18,11 +18,11 @@ void	ft_get_fork(t_philo *philo)
 	print_status(philo, FORK_ACTION);
 	pthread_mutex_lock(&philo->mutex[philo->r_fork]);
 	print_status(philo, FORK_ACTION);
+	philo->die = -2;
 }
 
 void	ft_eat(t_philo *philo)
 {
-	philo->die = -2;
 	pthread_mutex_lock(philo->mtphilo);
 	philo->start = get_time();
 	philo->death_time = philo->start + philo->die_time;
@@ -30,15 +30,15 @@ void	ft_eat(t_philo *philo)
 	usleep(philo->eat_time * 1000);
 	if (philo->eat_num != -1)
 		philo->eat_num--;
-	pthread_mutex_unlock(philo->mtphilo);
 	philo->die = 0;
+	pthread_mutex_unlock(philo->mtphilo);
 }
 
 void	ft_finish_eat(t_philo *philo)
 {
-	print_status(philo, SLEEP_ACTION);
 	pthread_mutex_unlock(&philo->mutex[philo->l_fork]);
 	pthread_mutex_unlock(&philo->mutex[philo->r_fork]);
+	print_status(philo, SLEEP_ACTION);
 	usleep(philo->sleep_time * 1000);
 	print_status(philo, THINK_ACTION);
 }
