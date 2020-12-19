@@ -32,7 +32,8 @@ void	print_status(t_philo *philo, int action)
 {
 	char	*tmp;
 
-	sem_wait(philo->print);
+	if (sem_wait(philo->print) < 0)
+		exit (1);
 	if (philo->die == 2)
 		exit (0);
 	ft_putnbr(get_time() - philo->table->start);
