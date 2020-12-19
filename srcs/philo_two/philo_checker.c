@@ -50,7 +50,7 @@ void	*ft_philo_checker(void *arg)
 	while (1)
 	{
 		sem_wait(philo->mtphilo);
-		if (philo->die == 0 && (philo->eat_num || philo->eat_num == -1)
+		if (philo->die == 0 && philo->eat_num != 0
 			&& get_time() > philo->death_time)
 		{
 			philo->die = 1;

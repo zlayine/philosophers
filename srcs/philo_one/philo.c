@@ -52,5 +52,7 @@ int		main(int argc, char **argv)
 		return (1);
 	table = init_table(argv);
 	create_lifes(table);
+	finish_simulation(table, !table->end);
+
 	return (0);
 }

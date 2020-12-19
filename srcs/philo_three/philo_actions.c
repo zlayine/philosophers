@@ -21,27 +21,31 @@ void	ft_get_fork(t_philo *philo)
 	philo->table->forks -= 2;
 }
 
-void	ft_drop_fork(t_philo *philo)
+void	ft_eat(t_philo *philo)
+{
+	sem_wait(philo->mtphilo);
+	philo->die = -2;
+	philo->start = get_time();
+	philo->death_time = philo->start + philo->die_time;
+	print_status(philo, EAT_ACTION);
+	usleep(philo->eat_time * 1000);
+	if (philo->eat_num != -1)
+		philo->eat_num--;
+	philo->die = 0;
+	sem_post(philo->mtphilo);
+}
+
+void	ft_finish_eat(t_philo *philo)
 {
 	sem_post(philo->sem);
 	sem_post(philo->sem);
 	philo->table->forks += 2;
-}
-
-void	ft_eat(t_philo *philo)
-{
-	philo->start = get_current_time(1, philo->start_time);
-	print_status(philo, EAT_ACTION);
-	usleep(philo->eat_time * 1000);
-	ft_drop_fork(philo);
-	if (philo->eat_num != -1)
-		philo->eat_num--;
-	ft_sleep(philo);
-}
-
-void	ft_sleep(t_philo *philo)
-{
 	print_status(philo, SLEEP_ACTION);
 	usleep(philo->sleep_time * 1000);
 	print_status(philo, THINK_ACTION);
+	if (philo->eat_num == 0)
+	{
+		sem_post(philo->done);
+		philo->die = -1;
+	}
 }

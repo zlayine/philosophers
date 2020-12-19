@@ -15,6 +15,7 @@
 t_philo		*init_philo(int name, t_philo *prev, char **args)
 {
 	t_philo	*philo;
+	char	*tmp;
 
 	philo = malloc(sizeof(t_philo));
 	philo->die_time = ft_atoi(args[1]);
@@ -22,6 +23,9 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->sleep_time = ft_atoi(args[3]);
 	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
 	philo->name = name;
+	tmp = ft_strjoin("sem_ph_", ft_itoa(name));
+	philo->mtphilo = init_semaphore(1, tmp);
+	ft_del(tmp);
 	philo->head = 0;
 	philo->start = 0;
 	philo->die = 0;
@@ -63,17 +67,13 @@ t_philo		*create_philos(int i, t_table *table, char **args)
 t_table		*init_table(char **args)
 {
 	t_table	*table;
-	int		i;
-	sem_t	*game;
 
-	i = 0;
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
 	table->end = 0;
 	table->philos = create_philos(-1, table, args);
-	game = init_semaphore(1, "game_sem");
-	table->game = game;
+	table->mtdie = init_semaphore(1, "game_sem");
 	return (table);
 }
 

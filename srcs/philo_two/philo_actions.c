@@ -36,9 +36,9 @@ void	ft_eat(t_philo *philo)
 
 void	ft_finish_eat(t_philo *philo)
 {
+	sem_post(philo->sem);
+	sem_post(philo->sem);
 	print_status(philo, SLEEP_ACTION);
-	sem_post(philo->sem);
-	sem_post(philo->sem);
 	usleep(philo->sleep_time * 1000);
 	print_status(philo, THINK_ACTION);
 }
