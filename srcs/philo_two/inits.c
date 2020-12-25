@@ -6,13 +6,13 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 19:49:54 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/25 14:25:30 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-t_philo		*init_philo(int name, t_philo *prev, char **args)
+t_philo		*init_philo(int name, t_philo *prev, char **args, int argc)
 {
 	t_philo	*philo;
 	char	*strname;
@@ -22,7 +22,7 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	philo->die_time = ft_atoi(args[1]);
 	philo->eat_time = ft_atoi(args[2]);
 	philo->sleep_time = ft_atoi(args[3]);
-	philo->eat_num = args[4] ? ft_atoi(args[4]) : -1;
+	philo->eat_num = argc == 6 ? ft_atoi(args[4]) : -1;
 	philo->name = name;
 	strname = ft_itoa(name);
 	tmp = ft_strjoin("sem_ph_", strname);
@@ -40,7 +40,7 @@ t_philo		*init_philo(int name, t_philo *prev, char **args)
 	return (philo);
 }
 
-t_philo		*create_philos(int total, t_table *table, char **args)
+t_philo		*create_philos(int total, t_table *table, char **args, int argc)
 {
 	t_philo			*head;
 	t_philo			*tmp;
@@ -55,7 +55,7 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	print = init_semaphore(1, "print_sem");
 	while (i < total)
 	{
-		tmp = init_philo(i + 1, tmp, args);
+		tmp = init_philo(i + 1, tmp, args, argc);
 		tmp->table = table;
 		tmp->sem = sem;
 		tmp->print = print;
@@ -69,7 +69,7 @@ t_philo		*create_philos(int total, t_table *table, char **args)
 	return (head);
 }
 
-t_table		*init_table(char **args)
+t_table		*init_table(char **args, int argc)
 {
 	t_table	*table;
 	int		i;
@@ -81,7 +81,7 @@ t_table		*init_table(char **args)
 	table->end = 0;
 	table->start = get_time();
 	table->mtdie = init_semaphore(1, "sem_game");
-	table->philos = create_philos(table->persons, table, args);
+	table->philos = create_philos(table->persons, table, args, argc);
 	return (table);
 }
 

@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/18 14:40:12 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/25 14:23:25 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,9 @@ size_t			ft_strlen(const char *str);
 void			ft_putnbr(long long d);
 void			print_status(t_philo *philo, int action);
 int				ft_philo_life(t_philo *philo);
-t_philo			*init_philo(int name, t_philo *prev, char **args);
-t_philo			*create_philos(int total, t_table *table, char **args);
-t_table			*init_table(char **args);
+t_philo			*init_philo(int name, t_philo *prev, char **args, int argc);
+t_philo			*create_philos(int i, t_table *table, char **args, int argc);
+t_table			*init_table(char **args, int argc);
 void			create_lifes(t_table *table);
 void			finish_simulation(t_table *table);
 void			ft_eat(t_philo *philo);
@@ -84,7 +84,7 @@ sem_t			*init_semaphore(int total, char *name);
 void			*game_checker(void *arg);
 void			free_simulation(t_philo *curr);
 void			life_creation_end(t_table *table, pid_t *pids);
-t_table			*init_table(char **args);
+t_table			*init_table(char **args, int argc);
 void			create_lifes(t_table *table);
 int				valid_args(int total, char **args);
 long			get_time();

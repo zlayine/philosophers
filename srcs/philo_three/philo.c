@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:39:14 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 16:37:48 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/25 14:23:38 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int		main(int argc, char **argv)
 
 	if (!valid_args(argc, ++argv))
 		return (1);
-	table = init_table(argv);
+	table = init_table(argv, argc);
 	create_lifes(table);
 	finish_simulation(table);
 	return (0);

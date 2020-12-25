@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:26:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 19:30:15 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/25 14:21:17 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ t_philo		*init_philo(int name, t_philo *prev, char **args, int argc)
 	philo->die_time = ft_atoi(args[1]);
 	philo->eat_time = ft_atoi(args[2]);
 	philo->sleep_time = ft_atoi(args[3]);
-	philo->eat_num = argc == 5 ? ft_atoi(args[4]) : -1;
+	philo->eat_num = argc == 6 ? ft_atoi(args[4]) : -1;
 	philo->name = name;
 	philo->mtphilo = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(philo->mtphilo, NULL);
