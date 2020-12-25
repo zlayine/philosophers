@@ -57,7 +57,7 @@ $(PHILO_THREE): $(OBJ) $(SRCS_THREE) $(PHILO_THREE_MAIN) $(PHILO_THREE_HEAD)
 	@echo "PHILO THREE SUCCESS!"
 
 %.o: %.c
-	gcc -c -Wall -Wextra -Werror $< -o $@ -I philo.h
+	@gcc -c -Wall -Wextra -Werror $< -o $@ -I philo.h
 
 clean:
 	@rm -rf $(OBJ)
