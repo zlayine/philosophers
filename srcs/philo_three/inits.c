@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:38:33 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/25 14:23:04 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:00:20 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ t_philo		*init_philo(int name, t_philo *prev, char **args, int argc)
 	t_philo	*philo;
 	char	*tmp;
 	char	*strname;
-	
+
 	philo = malloc(sizeof(t_philo));
 	philo->die_time = ft_atoi(args[1]);
 	philo->eat_time = ft_atoi(args[2]);
@@ -49,6 +49,7 @@ t_philo		*create_philos(int i, t_table *table, char **args, int argc)
 	sem_t			*done;
 
 	head = NULL;
+	tmp = NULL;
 	sem = init_semaphore(table->forks, "table_sem");
 	print = init_semaphore(1, "print_sem");
 	done = init_semaphore(0, "done_sem");

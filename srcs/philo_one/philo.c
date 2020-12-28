@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:24:59 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 19:26:29 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:03:04 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@ char	*get_action(int action)
 
 void	print_status(t_philo *philo, int action)
 {
-	char	*tmp;
-
 	if (pthread_mutex_lock(philo->print) < 0)
 		exit(1);
 	ft_putnbr(get_time() - philo->table->start);
@@ -53,6 +51,6 @@ int		main(int argc, char **argv)
 		return (1);
 	table = init_table(argc, argv);
 	create_lifes(table);
-	finish_simulation(table, !table->end);
+	finish_simulation(table);
 	return (0);
 }

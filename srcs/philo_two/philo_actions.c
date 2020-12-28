@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 19:57:13 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 14:59:37 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_get_fork(t_philo *philo)
 
 void	ft_eat(t_philo *philo)
 {
-	if (!philo || sem_wait(philo->mtphilo) < 0 )
+	if (!philo || sem_wait(philo->mtphilo) < 0)
 		exit(1);
 	philo->die = -2;
 	philo->start = get_time();

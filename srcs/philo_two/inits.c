@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/25 14:25:30 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:04:10 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ t_table		*init_table(char **args, int argc)
 	table = malloc(sizeof(t_table));
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
-	table->end = 0;
 	table->start = get_time();
 	table->mtdie = init_semaphore(1, "sem_game");
 	table->philos = create_philos(table->persons, table, args, argc);

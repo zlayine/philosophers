@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:26:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/25 14:21:17 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:06:52 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ t_philo		*init_philo(int name, t_philo *prev, char **args, int argc)
 	philo->l_fork = 0;
 	if (prev)
 	{
-		
 		philo->l_fork = prev->r_fork;
 		prev->next = philo;
 	}
@@ -58,8 +57,8 @@ t_table		*init_table(int argc, char **args)
 	table->persons = atoi(args[0]);
 	table->forks = atoi(args[0]);
 	table->philos = create_philos(table->persons, table, args, argc);
+	table->philos->head = 1;
 	table->start = get_time();
-	table->end = 0;
 	table->mtdie = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(table->mtdie, NULL);
 	return (table);
@@ -91,6 +90,5 @@ t_philo		*create_philos(int total, t_table *table, char **args, int argc)
 	head->l_fork = tmp->r_fork;
 	head->prev = tmp;
 	tmp->next = head;
-	head->head = 1;
 	return (head);
 }

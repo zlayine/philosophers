@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:25:37 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/25 14:26:02 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:03:15 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void	*game_checker(void *arg)
 	if (!philo)
 		return (NULL);
 	print_status(philo, SIM_OVER);
-	table->end = 1;
 	pthread_mutex_unlock(table->mtdie);
 	return (NULL);
 }

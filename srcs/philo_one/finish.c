@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:11 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 19:31:34 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:02:33 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,9 @@ void	free_simulation(t_philo *curr, int total)
 	}
 }
 
-void	finish_simulation(t_table *table, int death)
+void	finish_simulation(t_table *table)
 {
 	t_philo	*curr;
-	t_philo	*tmp;
-	int		i;
 
 	curr = table->philos;
 	free_simulation(curr, table->persons);

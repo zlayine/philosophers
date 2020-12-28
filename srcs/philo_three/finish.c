@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:52:29 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 20:03:09 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:04:26 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ void	free_simulation(t_philo *curr)
 void	finish_simulation(t_table *table)
 {
 	t_philo	*curr;
-	t_philo	*tmp;
 	sem_t	*print;
 
 	curr = table->philos;

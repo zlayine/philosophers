@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:32:18 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/19 19:27:30 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:03:33 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ typedef struct	s_table
 	int				persons;
 	int				forks;
 	struct s_philo	*philos;
-	int				end;
 	long			start;
 	pthread_mutex_t	*mtdie;
 }				t_table;
@@ -71,10 +70,10 @@ void			ft_putnbr(long long d);
 void			print_status(t_philo *philo, int action);
 void			*ft_philo_life(void *arg);
 t_philo			*init_philo(int name, t_philo *prev, char **args, int argc);
-t_philo			*create_philos(int total, t_table *table, char **args, int argc);
+t_philo			*create_philos(int i, t_table *table, char **args, int argc);
 t_table			*init_table(int argc, char **args);
 void			create_lifes(t_table *table);
-void			finish_simulation(t_table *table, int death);
+void			finish_simulation(t_table *table);
 void			ft_eat(t_philo *philo);
 void			ft_get_fork(t_philo *philo);
 void			ft_finish_eat(t_philo *philo);

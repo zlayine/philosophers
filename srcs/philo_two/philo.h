@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:58:06 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/25 14:24:21 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:04:09 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ typedef struct	s_table
 {
 	int				persons;
 	int				forks;
-	int				end;
 	sem_t			*mtdie;
 	long			start;
 	struct s_philo	*philos;
@@ -78,7 +77,7 @@ t_philo			*init_philo(int name, t_philo *prev, char **args, int argc);
 t_philo			*create_philos(int i, t_table *table, char **args, int argc);
 t_table			*init_table(char **args, int argc);
 void			create_lifes(t_table *table);
-void			finish_simulation(t_table *table, int death);
+void			finish_simulation(t_table *table);
 void			ft_eat(t_philo *philo);
 void			ft_get_fork(t_philo *philo);
 void			ft_finish_eat(t_philo *philo);

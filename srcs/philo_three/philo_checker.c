@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 14:38:30 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/16 09:37:42 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:05:00 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ int		ft_philo_life(t_philo *me)
 void	life_creation_end(t_table *table, pid_t *pids)
 {
 	int			i;
-	pthread_t	checker;
 
 	i = -1;
 	sem_wait(table->mtdie);

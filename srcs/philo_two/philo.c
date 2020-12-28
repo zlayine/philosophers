@@ -6,7 +6,7 @@
 /*   By: zlayine <zlayine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 16:51:05 by zlayine           #+#    #+#             */
-/*   Updated: 2020/12/25 14:23:54 by zlayine          ###   ########.fr       */
+/*   Updated: 2020/12/28 15:03:51 by zlayine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,9 @@ char	*get_action(int action)
 
 void	print_status(t_philo *philo, int action)
 {
-	char	*tmp;
-
 	if (!philo || sem_wait(philo->print) < 0)
 		exit(1);
-	if (!philo || !philo->table ||philo->die == 2)
+	if (!philo || !philo->table || philo->die == 2)
 		exit(0);
 	ft_putnbr(get_time() - philo->table->start);
 	ft_putchar('\t');
@@ -55,6 +53,6 @@ int		main(int argc, char **argv)
 		return (1);
 	table = init_table(argv, argc);
 	create_lifes(table);
-	finish_simulation(table, !table->end);
+	finish_simulation(table);
 	return (0);
 }
